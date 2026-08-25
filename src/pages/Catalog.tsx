@@ -8,54 +8,50 @@ import { useApp } from "../store/AppStore";
 import { ImplementCard, MachineCard } from "../components/MachineCard";
 import { Btn, IcChevronD, IcFilter, IcHeart, IcSearch, IcX, Kicker, Reveal } from "../components/ui";
 
-export type CatalogMode = "all" | "novos" | "usados" | "implementos" | "favoritas";
+export type CatalogMode = "all" | "originais" | "compativeis" | "motores" | "favoritas";
 
 const MODE_META: Record<CatalogMode, { kicker: string; title: string; sub: string }> = {
   all: {
-    kicker: "Estoque completo",
-    title: "Todas as máquinas",
-    sub: "Tratores, colheitadeiras, escavadeiras e retroescavadeiras — novas e usadas, com ficha técnica e preço transparente.",
+    kicker: "Estoque online",
+    title: "Todas as peças",
+    sub: "Bombas, rolamentos, duocones, filtros, engrenagens e muito mais para o seu rolo compactador — com código, aplicação e preço na mesa.",
   },
-  novos: {
-    kicker: "Zero hora",
-    title: "Máquinas novas",
-    sub: "Unidades zero hora no pátio ou sob encomenda, com garantia de fábrica e pronta entrega sinalizada.",
+  originais: {
+    kicker: "Linha genuína",
+    title: "Peças originais",
+    sub: "Peças com procedência de fábrica e garantia. Para quem não abre mão do especificado no manual.",
   },
-  usados: {
-    kicker: "Revisados no pátio",
-    title: "Máquinas usadas",
-    sub: "Usados selecionados com histórico, horímetro verificado e revisão de entrega de 120 pontos.",
+  compativeis: {
+    kicker: "Custo inteligente",
+    title: "Peças compatíveis",
+    sub: "Alternativas revisadas e selecionadas pela nossa equipe técnica, com qualidade conferida peça a peça.",
   },
-  implementos: {
-    kicker: "Para acoplar e trabalhar",
-    title: "Implementos",
-    sub: "Arados, grades, plantadeiras, carretas, roçadeiras e distribuidores prontos para o talhão.",
+  motores: {
+    kicker: "Coração da máquina",
+    title: "Motores",
+    sub: "Perkins, MWM, Cummins, Deutz, Kubota e Mercedes-Benz: motores completos e peças com pronta entrega.",
   },
   favoritas: {
-    kicker: "Minhas máquinas",
+    kicker: "Minhas peças",
     title: "Sua lista salva",
-    sub: "Máquinas que você marcou com o coração ficam guardadas neste navegador.",
+    sub: "Peças que você marcou com o coração ficam guardadas neste navegador — pronto para montar o pedido.",
   },
 };
 
-const BADGE_OPTIONS = ["Revisado", "Único dono", "Baixas horas", "Pronta entrega", "Oportunidade", "Redução de preço"];
+const BADGE_OPTIONS = ["Pronta entrega", "Mais vendido", "Testada em bancada", "Peça de grande porte"];
 
 interface Filters {
   q: string;
   categorias: Category[];
   marcas: string[];
-  condicao: "" | "novo" | "usado";
+  condition: "" | "original" | "compativel";
   status: "" | "disponivel" | "reservada" | "vendida";
-  pot: "" | "ate100" | "100a200" | "200mais";
-  anoMin: string;
-  horasMax: string;
-  preco: "" | "ate300" | "300a700" | "700mais" | "consultar";
+  preco: "" | "ate500" | "500a2000" | "2000mais" | "consulta";
   badges: string[];
 }
 
-const EMPTY: Filters = { q: "", categorias: [], marcas: [], condicao: "", status: "", pot: "", anoMin: "", horasMax: "", preco: "", badges: [] };
-
-type SortKey = "relevancia" | "menor-preco" | "maior-preco" | "menor-horas" | "mais-novo" | "maior-potencia";
+const EMPTY: Filters = { q: "", categorias: [], marcas: [], condition: "", status: "", preco: "", badges: [] };
+type SortKey = "relevancia" | "menor-preco" | "maior-preco" | "az";
 
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -98,26 +94,10 @@ function CheckRow({ label, checked, onToggle, count }: { label: string; checked:
 const selectCls =
   "w-full border border-line-dark bg-coal-800 px-3 py-2.5 font-cond text-[13px] font-semibold uppercase tracking-[0.1em] text-bone-100 focus:border-hz-400 focus:outline-none";
 
-function FiltersPanel({
-  f,
-  setF,
-  mode,
-}: {
-  f: Filters;
-  setF: (f: Filters) => void;
-  mode: CatalogMode;
-}) {
-  const machinesInScope = useMemo(() => {
-    if (mode === "novos") return MACHINES.filter((m) => m.condition === "novo");
-    if (mode === "usados") return MACHINES.filter((m) => m.condition === "usado");
-    return MACHINES;
-  }, [mode]);
-
-  const cats = (Object.keys(CATEGORY_META) as (keyof typeof CATEGORY_META)[]).filter((c) => c !== "implementos");
-  const marcas = [...new Set(machinesInScope.map((m) => m.brand))];
+function FiltersPanel({ f, setF, scope }: { f: Filters; setF: (f: Filters) => void; scope: Machine[] }) {
+  const marcas = [...new Set(scope.map((m) => m.brand))];
   const activeCount =
-    f.categorias.length + f.marcas.length + f.badges.length + (f.condicao ? 1 : 0) + (f.status ? 1 : 0) + (f.pot ? 1 : 0) + (f.anoMin ? 1 : 0) + (f.horasMax ? 1 : 0) + (f.preco ? 1 : 0);
-
+    f.categorias.length + f.marcas.length + f.badges.length + (f.condition ? 1 : 0) + (f.status ? 1 : 0) + (f.preco ? 1 : 0);
   const toggleIn = <T,>(arr: T[], v: T): T[] => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
 
   return (
@@ -125,83 +105,59 @@ function FiltersPanel({
       <div className="flex items-center justify-between">
         <p className="font-cond text-[14px] font-bold uppercase tracking-[0.24em] text-hz-300">Filtros</p>
         {activeCount > 0 && (
-          <button onClick={() => setF({ ...EMPTY, q: f.q })} className="font-cond text-[12px] font-bold uppercase tracking-[0.16em] text-safety-400 transition-colors hover:text-safety-500">
+          <button onClick={() => setF({ ...EMPTY, q: f.q })} className="font-cond text-[12px] font-bold uppercase tracking-[0.16em] text-safety-400 hover:text-safety-500">
             Limpar ({activeCount})
           </button>
         )}
       </div>
 
-      <FilterGroup title="Categoria">
-        {cats.map((c) => (
+      <FilterGroup title="Família da peça">
+        {(Object.keys(CATEGORY_META) as Category[]).map((c) => (
           <CheckRow
             key={c}
             label={CATEGORY_META[c].plural}
-            count={machinesInScope.filter((m) => m.category === c).length}
+            count={scope.filter((m) => m.category === c).length}
             checked={f.categorias.includes(c)}
             onToggle={() => setF({ ...f, categorias: toggleIn(f.categorias, c) })}
           />
         ))}
       </FilterGroup>
 
-      {mode !== "novos" && mode !== "usados" && (
-        <FilterGroup title="Condição">
-          {(["novo", "usado"] as const).map((c) => (
-            <CheckRow key={c} label={c === "novo" ? "Novo" : "Usado"} checked={f.condicao === c} onToggle={() => setF({ ...f, condicao: f.condicao === c ? "" : c })} />
-          ))}
-        </FilterGroup>
-      )}
-
-      <FilterGroup title="Marca">
+      <FilterGroup title="Marca do rolo">
         {marcas.map((m) => (
-          <CheckRow key={m} label={m} count={machinesInScope.filter((x) => x.brand === m).length} checked={f.marcas.includes(m)} onToggle={() => setF({ ...f, marcas: toggleIn(f.marcas, m) })} />
+          <CheckRow key={m} label={m} count={scope.filter((x) => x.brand === m).length} checked={f.marcas.includes(m)} onToggle={() => setF({ ...f, marcas: toggleIn(f.marcas, m) })} />
         ))}
       </FilterGroup>
 
-      <FilterGroup title="Potência">
-        <select className={selectCls} value={f.pot} onChange={(e) => setF({ ...f, pot: e.target.value as Filters["pot"] })} aria-label="Faixa de potência">
-          <option value="">Todas</option>
-          <option value="ate100">Até 100 cv</option>
-          <option value="100a200">100 – 200 cv</option>
-          <option value="200mais">Acima de 200 cv</option>
-        </select>
-      </FilterGroup>
-
-      <FilterGroup title="Ano & horas">
-        <div className="grid grid-cols-2 gap-2">
-          <select className={selectCls} value={f.anoMin} onChange={(e) => setF({ ...f, anoMin: e.target.value })} aria-label="Ano mínimo">
-            <option value="">Ano mín.</option>
-            {[2025, 2023, 2021, 2019, 2017].map((y) => (
-              <option key={y} value={y}>{y}+</option>
-            ))}
-          </select>
-          <select className={selectCls} value={f.horasMax} onChange={(e) => setF({ ...f, horasMax: e.target.value })} aria-label="Horas máximas">
-            <option value="">Horas máx.</option>
-            <option value="1000">1.000 h</option>
-            <option value="2000">2.000 h</option>
-            <option value="3500">3.500 h</option>
-            <option value="5000">5.000 h</option>
-          </select>
-        </div>
+      <FilterGroup title="Tipo">
+        {(["original", "compativel"] as const).map((c) => (
+          <CheckRow key={c} label={c === "original" ? "Original" : "Compatível"} checked={f.condition === c} onToggle={() => setF({ ...f, condition: f.condition === c ? "" : c })} />
+        ))}
       </FilterGroup>
 
       <FilterGroup title="Preço">
         <select className={selectCls} value={f.preco} onChange={(e) => setF({ ...f, preco: e.target.value as Filters["preco"] })} aria-label="Faixa de preço">
           <option value="">Qualquer valor</option>
-          <option value="ate300">Até R$ 300 mil</option>
-          <option value="300a700">R$ 300 – 700 mil</option>
-          <option value="700mais">Acima de R$ 700 mil</option>
-          <option value="consultar">Somente "a consultar"</option>
+          <option value="ate500">Até R$ 500</option>
+          <option value="500a2000">R$ 500 – 2.000</option>
+          <option value="2000mais">Acima de R$ 2.000</option>
+          <option value="consulta">Somente "sob consulta"</option>
         </select>
       </FilterGroup>
 
       <FilterGroup title="Situação">
         {(["disponivel", "reservada", "vendida"] as const).map((s) => (
-          <CheckRow key={s} label={s === "disponivel" ? "Disponível" : s === "reservada" ? "Reservada" : "Vendida"} checked={f.status === s} onToggle={() => setF({ ...f, status: f.status === s ? "" : s })} />
+          <CheckRow
+            key={s}
+            label={s === "disponivel" ? "Em estoque" : s === "reservada" ? "Reservada" : "Esgotada"}
+            checked={f.status === s}
+            onToggle={() => setF({ ...f, status: f.status === s ? "" : s })}
+          />
         ))}
       </FilterGroup>
 
       <FilterGroup title="Selos">
-        {BADGE_OPTIONS.filter((b) => machinesInScope.some((m) => m.badges.includes(b))).map((b) => (
+        {BADGE_OPTIONS.filter((b) => scope.some((m) => m.badges.includes(b))).map((b) => (
           <CheckRow key={b} label={b} checked={f.badges.includes(b)} onToggle={() => setF({ ...f, badges: toggleIn(f.badges, b) })} />
         ))}
       </FilterGroup>
@@ -210,11 +166,11 @@ function FiltersPanel({
 }
 
 const SEO_COPY: Record<CatalogMode, string> = {
-  all: `A ${BUSINESS.name} mantém estoque próprio de máquinas agrícolas e pesadas em ${BUSINESS.address.city}/${BUSINESS.address.state}: trator à venda, colheitadeira, escavadeira e retroescavadeira com procedência, além de implementos e peças. Todas as unidades passam por checklist de entrega e podem ser financiadas ou entradas em consórcio.`,
-  novos: `Máquinas novas com pronta entrega em ${BUSINESS.address.city}: tratores e escavadeiras zero hora com garantia de fábrica, faturamento direto e condições especiais para produtor rural e CNPJ.`,
-  usados: `Procurando trator usado ou máquina pesada seminova? Nosso catálogo de usados tem horímetro verificado, histórico de manutenção e revisão de entrega. Usado bom é o que tem procedência — e aqui tem.`,
-  implementos: `Implementos agrícolas à venda em ${BUSINESS.address.city}: arado, grade aradora, plantadeira, carreta graneleira, roçadeira, distribuidor de calcário e subsolador, compatíveis com as principais marcas de trator.`,
-  favoritas: "Sua lista de máquinas salvas — disponível neste navegador.",
+  all: `A ${BUSINESS.name} distribui peças para rolos compactadores em ${BUSINESS.address.city}/${BUSINESS.address.state} desde ${BUSINESS.founded}: bombas hidráulicas, rolamentos, duocones, filtros, engrenagens, caixas de transmissão, rodas, pneus e vedações para Dynapac, Muller, Hamm, Tema-Terra, Caterpillar, Bomag e outras marcas. Estoque próprio com mais de 30.000 itens e envio para todo o Brasil.`,
+  originais: `Peças originais para rolo compactador com procedência de fábrica: Dynapac, Hamm, Muller, Bomag e mais. Peça com nota, garantia e despacho rápido a partir de ${BUSINESS.address.city}/${BUSINESS.address.state}.`,
+  compativeis: `Peças compatíveis revisadas para rolos compactadores: alternativa com qualidade conferida e preço justo. Duocone, kit de vedações, filtros e mais com pronta entrega.`,
+  motores: `Motores para rolos compactadores e equipamentos pesados: Perkins, MWM, Cummins, Deutz, Kubota e Mercedes-Benz. Peças de motor com pronta entrega em São Paulo e envio para todo o Brasil.`,
+  favoritas: "Sua lista de peças salvas — disponível neste navegador.",
 };
 
 export default function Catalog({ mode }: { mode: CatalogMode }) {
@@ -225,51 +181,40 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
   const [sort, setSort] = useState<SortKey>("relevancia");
   const [implType, setImplType] = useState("");
 
+  const scope = useMemo(() => {
+    if (mode === "originais") return MACHINES.filter((m) => m.condition === "original");
+    if (mode === "compativeis") return MACHINES.filter((m) => m.condition === "compativel");
+    return MACHINES;
+  }, [mode]);
+
   const [filters, setFilters] = useState<Filters>(() => {
     const cat = params.get("categoria");
-    const valid: string[] = ["tratores", "colheitadeiras", "escavadeiras", "retroescavadeiras"];
-    return {
-      ...EMPTY,
-      categorias: cat && valid.includes(cat) ? [cat as Category] : [],
-    };
+    const valid: string[] = Object.keys(CATEGORY_META);
+    return { ...EMPTY, categorias: cat && valid.includes(cat) ? [cat as Category] : [] };
   });
 
-  usePageMeta(
-    `${meta.title} — ${BUSINESS.name} | ${BUSINESS.address.city}/${BUSINESS.address.state}`,
-    SEO_COPY[mode],
-  );
+  usePageMeta(`${meta.title} — ${BUSINESS.name} | ${BUSINESS.address.city}/${BUSINESS.address.state}`, SEO_COPY[mode]);
 
   const results = useMemo(() => {
-    let list: Machine[] = MACHINES;
-    if (mode === "novos") list = list.filter((m) => m.condition === "novo");
-    if (mode === "usados") list = list.filter((m) => m.condition === "usado");
+    let list: Machine[] = scope;
     if (mode === "favoritas") list = list.filter((m) => favorites.includes(m.id));
 
     const q = filters.q.trim().toLowerCase();
     if (q)
       list = list.filter((m) =>
-        [m.brand, m.model, m.code, CATEGORY_META[m.category].label, m.application, String(m.year)].join(" ").toLowerCase().includes(q),
+        [m.brand, m.oem, m.model, m.code, CATEGORY_META[m.category].label, CATEGORY_META[m.category].plural, m.application].join(" ").toLowerCase().includes(q),
       );
     if (filters.categorias.length) list = list.filter((m) => filters.categorias.includes(m.category));
-    if (filters.condicao) list = list.filter((m) => m.condition === filters.condicao);
+    if (filters.condition) list = list.filter((m) => m.condition === filters.condition);
     if (filters.marcas.length) list = list.filter((m) => filters.marcas.includes(m.brand));
     if (filters.status) list = list.filter((m) => m.status === filters.status);
-    if (filters.pot)
-      list = list.filter((m) => {
-        if (!m.powerCv) return false;
-        if (filters.pot === "ate100") return m.powerCv <= 100;
-        if (filters.pot === "100a200") return m.powerCv > 100 && m.powerCv <= 200;
-        return m.powerCv > 200;
-      });
-    if (filters.anoMin) list = list.filter((m) => m.year >= Number(filters.anoMin));
-    if (filters.horasMax) list = list.filter((m) => (m.hours ?? 0) <= Number(filters.horasMax));
     if (filters.preco)
       list = list.filter((m) => {
-        if (filters.preco === "consultar") return m.price === null;
+        if (filters.preco === "consulta") return m.price === null;
         if (m.price === null) return false;
-        if (filters.preco === "ate300") return m.price <= 300000;
-        if (filters.preco === "300a700") return m.price > 300000 && m.price <= 700000;
-        return m.price > 700000;
+        if (filters.preco === "ate500") return m.price <= 500;
+        if (filters.preco === "500a2000") return m.price > 500 && m.price <= 2000;
+        return m.price > 2000;
       });
     if (filters.badges.length) list = list.filter((m) => filters.badges.every((b) => m.badges.includes(b)));
 
@@ -281,35 +226,28 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
       case "maior-preco":
         sorted.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
         break;
-      case "menor-horas":
-        sorted.sort((a, b) => (a.hours ?? 0) - (b.hours ?? 0));
-        break;
-      case "mais-novo":
-        sorted.sort((a, b) => b.year - a.year);
-        break;
-      case "maior-potencia":
-        sorted.sort((a, b) => (b.powerCv ?? 0) - (a.powerCv ?? 0));
+      case "az":
+        sorted.sort((a, b) => a.model.localeCompare(b.model, "pt-BR"));
         break;
       default:
         sorted.sort((a, b) => Number(b.featured ?? false) - Number(a.featured ?? false));
     }
     return sorted;
-  }, [mode, favorites, filters, sort]);
+  }, [mode, scope, favorites, filters, sort]);
 
   const implResults = useMemo(() => {
     let list = IMPLEMENTS;
     const q = filters.q.trim().toLowerCase();
-    if (q) list = list.filter((i) => [i.type, i.brand, i.model, i.code, i.compat].join(" ").toLowerCase().includes(q));
-    if (implType) list = list.filter((i) => i.type === implType);
+    if (q) list = list.filter((i) => [i.brand, i.model, i.type, i.compat].join(" ").toLowerCase().includes(q));
+    if (implType) list = list.filter((i) => i.brand === implType);
     return list;
   }, [filters.q, implType]);
 
-  const isImpl = mode === "implementos";
-  const count = isImpl ? implResults.length : results.length;
+  const isMotor = mode === "motores";
+  const count = isMotor ? implResults.length : results.length;
 
   return (
-    <div className="pt-[76px] lg:pt-[118px]">
-      {/* cabeçalho */}
+    <div className="pt-[120px] lg:pt-[150px]">
       <header className="border-b border-line-dark bg-coal-900">
         <div className="hazard-thin h-1.5 w-full opacity-60" aria-hidden="true" />
         <div className="mx-auto max-w-(--container-site) px-6 py-12 md:py-16">
@@ -327,7 +265,7 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
             </div>
             <Reveal delay={200}>
               <p className="border border-line-dark bg-coal-950 px-5 py-3 font-cond text-sm font-bold uppercase tracking-[0.2em] text-bone-100">
-                <span className="text-hz-300">{count}</span> {isImpl ? "implemento" + (count === 1 ? "" : "s") : "máquina" + (count === 1 ? "" : "s")}
+                <span className="text-hz-300">{count}</span> {isMotor ? "motor" + (count === 1 ? "" : "es") : "peça" + (count === 1 ? "" : "s")}
               </p>
             </Reveal>
           </div>
@@ -338,7 +276,7 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
               <input
                 value={filters.q}
                 onChange={(e) => setFilters({ ...filters, q: e.target.value })}
-                placeholder={isImpl ? "Buscar implemento, marca ou código…" : "Buscar por marca, modelo, categoria ou código (ex.: TF-0143)…"}
+                placeholder={isMotor ? "Buscar motor, marca ou aplicação…" : "Buscar por nome, código (ex.: LM-0143), marca ou aplicação…"}
                 aria-label="Buscar no catálogo"
                 className="w-full border border-line-dark bg-coal-950 py-3.5 pl-12 pr-4 text-[15px] text-bone-100 placeholder:text-steel-500 transition-colors focus:border-hz-400 focus:outline-none"
               />
@@ -348,11 +286,9 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
                 <option value="relevancia">Destaques primeiro</option>
                 <option value="menor-preco">Menor preço</option>
                 <option value="maior-preco">Maior preço</option>
-                <option value="menor-horas">Menos horas</option>
-                <option value="mais-novo">Mais novo</option>
-                <option value="maior-potencia">Maior potência</option>
+                <option value="az">A — Z</option>
               </select>
-              {!isImpl && (
+              {!isMotor && (
                 <button
                   onClick={() => setDrawer(true)}
                   className="flex items-center gap-2 border border-line-dark bg-coal-950 px-5 font-cond text-[13px] font-bold uppercase tracking-[0.16em] text-bone-100 transition-colors hover:border-hz-400 hover:text-hz-300 lg:hidden"
@@ -363,7 +299,7 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
             </div>
           </div>
 
-          {isImpl && (
+          {isMotor && (
             <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={() => setImplType("")}
@@ -371,7 +307,7 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
               >
                 Todos
               </button>
-              {[...new Set(IMPLEMENTS.map((i) => i.type))].map((t) => (
+              {[...new Set(IMPLEMENTS.map((i) => i.brand))].map((t) => (
                 <button
                   key={t}
                   onClick={() => setImplType(implType === t ? "" : t)}
@@ -386,11 +322,11 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
       </header>
 
       <div className="mx-auto max-w-(--container-site) px-6 py-12 md:py-16">
-        <div className={cx(!isImpl && "grid gap-10 lg:grid-cols-[260px_1fr]")}>
-          {!isImpl && (
+        <div className={cx(!isMotor && "grid gap-10 lg:grid-cols-[260px_1fr]")}>
+          {!isMotor && (
             <aside className="hidden lg:block" aria-label="Filtros do catálogo">
-              <div className="sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto pr-2">
-                <FiltersPanel f={filters} setF={setFilters} mode={mode} />
+              <div className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
+                <FiltersPanel f={filters} setF={setFilters} scope={scope} />
               </div>
             </aside>
           )}
@@ -401,25 +337,25 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
                 {mode === "favoritas" ? (
                   <>
                     <IcHeart size={44} className="text-steel-500" />
-                    <h2 className="mt-5 font-display text-3xl uppercase">Nenhuma máquina salva ainda</h2>
-                    <p className="mt-3 max-w-sm text-[15px] text-steel-300">Toque no coração de qualquer card para guardar a máquina aqui — a lista fica neste navegador.</p>
-                    <Btn to="/maquinas" className="mt-7">Ver o estoque</Btn>
+                    <h2 className="mt-5 font-display text-3xl uppercase">Nenhuma peça salva ainda</h2>
+                    <p className="mt-3 max-w-sm text-[15px] text-steel-300">Toque no coração de qualquer card para guardar a peça aqui — depois é só pedir o orçamento da lista toda.</p>
+                    <Btn to="/pecas" className="mt-7">Ver o estoque</Btn>
                   </>
                 ) : (
                   <>
                     <IcSearch size={44} className="text-steel-500" />
                     <h2 className="mt-5 font-display text-3xl uppercase">Nada encontrado com esses filtros</h2>
-                    <p className="mt-3 max-w-sm text-[15px] text-steel-300">Afrouxe um filtro ou dois — ou fale com a gente: se não está no pátio, a gente caça para você.</p>
+                    <p className="mt-3 max-w-sm text-[15px] text-steel-300">Lembre: o site mostra só uma amostra — são mais de 30.000 itens no estoque físico. Se não achou, a gente encontra.</p>
                     <div className="mt-7 flex flex-wrap justify-center gap-3">
                       <Btn tone="outline" onClick={() => setFilters({ ...EMPTY })}>Limpar filtros</Btn>
-                      <Btn to="/contato">Falar com vendedor</Btn>
+                      <Btn to="/busca">Não achou a peça?</Btn>
                     </div>
                   </>
                 )}
               </div>
             ) : (
-              <div className={cx("grid gap-6", isImpl ? "sm:grid-cols-2 xl:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-3")}>
-                {isImpl
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {isMotor
                   ? implResults.map((it, i) => <ImplementCard key={it.id} it={it} delay={(i % 3) * 70} />)
                   : results.map((m, i) => <MachineCard key={m.id} m={m} delay={(i % 3) * 70} />)}
               </div>
@@ -432,7 +368,7 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
         </Reveal>
       </div>
 
-      {/* drawer mobile de filtros */}
+      {/* drawer mobile */}
       <div className={cx("fixed inset-0 z-[75] lg:hidden", drawer ? "pointer-events-auto" : "pointer-events-none")} aria-hidden={!drawer}>
         <div className={cx("absolute inset-0 bg-coal-950/70 transition-opacity duration-300", drawer ? "opacity-100" : "opacity-0")} onClick={() => setDrawer(false)} />
         <div
@@ -448,11 +384,11 @@ export default function Catalog({ mode }: { mode: CatalogMode }) {
             </button>
           </div>
           <div className="flex-1 overflow-y-auto px-5 pb-6">
-            <FiltersPanel f={filters} setF={setFilters} mode={mode} />
+            <FiltersPanel f={filters} setF={setFilters} scope={scope} />
           </div>
           <div className="border-t border-line-dark p-4">
             <Btn className="w-full" onClick={() => setDrawer(false)}>
-              Ver {count} {count === 1 ? "máquina" : "máquinas"}
+              Ver {count} {count === 1 ? "peça" : "peças"}
             </Btn>
           </div>
         </div>

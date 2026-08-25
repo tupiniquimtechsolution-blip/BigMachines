@@ -38,14 +38,14 @@ export default function App() {
         <PageShell>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/maquinas" element={<Catalog mode="all" />} />
-            <Route path="/maquinas/:slug" element={<MachineDetail />} />
-            <Route path="/novos" element={<Catalog mode="novos" />} />
-            <Route path="/usados" element={<Catalog mode="usados" />} />
-            <Route path="/implementos" element={<Catalog mode="implementos" />} />
-            <Route path="/minhas-maquinas" element={<Catalog mode="favoritas" />} />
-            <Route path="/financiamento" element={<FinancingPage />} />
-            <Route path="/troca" element={<TradeInPage />} />
+            <Route path="/pecas" element={<Catalog mode="all" />} />
+            <Route path="/pecas/:slug" element={<MachineDetail />} />
+            <Route path="/originais" element={<Catalog mode="originais" />} />
+            <Route path="/compativeis" element={<Catalog mode="compativeis" />} />
+            <Route path="/motores" element={<Catalog mode="motores" />} />
+            <Route path="/minhas-pecas" element={<Catalog mode="favoritas" />} />
+            <Route path="/orcamento" element={<FinancingPage />} />
+            <Route path="/busca" element={<TradeInPage />} />
             <Route path="/empresa" element={<Company />} />
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/conteudos" element={<Contents />} />

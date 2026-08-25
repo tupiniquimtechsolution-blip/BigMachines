@@ -5,36 +5,42 @@
   --font-body: "Barlow", "Segoe UI", sans-serif;
   --font-cond: "Barlow Condensed", "Arial Narrow", sans-serif;
 
-  --color-coal-950: #0a0b09;
-  --color-coal-900: #10120f;
-  --color-coal-800: #161914;
-  --color-coal-700: #1e221b;
-  --color-coal-600: #2a2f26;
-  --color-coal-500: #3a4034;
-  --color-steel-500: #565d50;
-  --color-steel-400: #6d7466;
-  --color-steel-300: #8f968a;
-  --color-steel-200: #b4baae;
-  --color-bone-100: #efece2;
-  --color-bone-200: #e4e0d2;
-  --color-bone-300: #d6d1bf;
-  --color-hz-300: #ffd23f;
-  --color-hz-400: #f5b70a;
-  --color-hz-500: #d99e00;
-  --color-hz-600: #a97b00;
-  --color-agri-300: #7fb98b;
-  --color-agri-400: #4f8f5c;
-  --color-agri-500: #35713f;
-  --color-agri-600: #275731;
-  --color-agri-700: #1c4025;
-  --color-safety-400: #f0662b;
-  --color-safety-500: #d9531e;
-  --color-line-dark: #24281f;
-  --color-line-light: #c9c4b2;
+  /* Asfalto */
+  --color-coal-950: #0b0c0e;
+  --color-coal-900: #121316;
+  --color-coal-800: #181a1e;
+  --color-coal-700: #20232a;
+  --color-coal-600: #2b2f38;
+  --color-coal-500: #3a4049;
+  /* Aço */
+  --color-steel-500: #5a616c;
+  --color-steel-400: #737a86;
+  --color-steel-300: #959ca8;
+  --color-steel-200: #bcc2cc;
+  /* Off-white / concreto */
+  --color-bone-100: #f0eee8;
+  --color-bone-200: #e3e0d7;
+  --color-bone-300: #d2cfc3;
+  /* Amarelo viário (sinalização de obra) */
+  --color-hz-300: #ffc94d;
+  --color-hz-400: #f7a800;
+  --color-hz-500: #d18f00;
+  --color-hz-600: #9e6c00;
+  /* Vermelho obra (acento secundário) */
+  --color-safety-400: #f0564a;
+  --color-safety-500: #dd3a2e;
+  /* Verde "liberado p/ despacho" */
+  --color-agri-300: #8fd0a0;
+  --color-agri-400: #4fae68;
+  --color-agri-500: #358a4c;
+  --color-agri-600: #28693a;
+  --color-agri-700: #1d4d2b;
+  --color-line-dark: #262a31;
+  --color-line-light: #c9c5b8;
 
   --container-site: 84rem;
 
-  --shadow-plate: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+  --shadow-plate: 0 24px 60px -24px rgba(0, 0, 0, 0.75);
   --shadow-card: 0 14px 40px -18px rgba(0, 0, 0, 0.65);
 }
 
@@ -62,7 +68,7 @@ body {
   outline-offset: 2px;
 }
 
-/* ---------- signature motifs ---------- */
+/* ---------- motivos da identidade (estrada/obra) ---------- */
 
 .hazard {
   background-image: repeating-linear-gradient(
@@ -78,6 +84,18 @@ body {
     var(--color-hz-400) 0 8px,
     var(--color-coal-950) 8px 16px
   );
+}
+
+/* faixa central de pista — separador de seções */
+.roadline {
+  height: 3px;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-hz-400) 0 46px,
+    transparent 46px 74px
+  );
+  background-size: 74px 3px;
+  opacity: 0.55;
 }
 
 .noise::after {
@@ -122,14 +140,14 @@ body {
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.65), 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* ---------- motion ---------- */
+/* ---------- movimento ---------- */
 
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 .animate-marquee {
-  animation: marquee 30s linear infinite;
+  animation: marquee 32s linear infinite;
   will-change: transform;
 }
 
@@ -143,8 +161,8 @@ body {
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(245, 183, 10, 0.55); }
-  100% { box-shadow: 0 0 0 18px rgba(245, 183, 10, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(247, 168, 0, 0.55); }
+  100% { box-shadow: 0 0 0 18px rgba(247, 168, 0, 0); }
 }
 .animate-pulse-ring { animation: pulse-ring 1.8s ease-out infinite; }
 
@@ -155,12 +173,6 @@ body {
   100% { transform: scaleY(0); transform-origin: bottom; }
 }
 .animate-scroll-line { animation: scroll-line 2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
-
-@keyframes float-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-.animate-float-y { animation: float-y 4s ease-in-out infinite; }
 
 .reveal-base {
   opacity: 0;

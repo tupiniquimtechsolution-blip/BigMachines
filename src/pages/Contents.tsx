@@ -2,152 +2,143 @@ import { useState } from "react";
 import { BUSINESS } from "../config/business";
 import { generalMessage, usePageMeta, waLink } from "../lib/utils";
 import { Btn, IcArrow, IcWhatsApp, Kicker, Reveal, SectionHead } from "../components/ui";
-import { cx } from "../lib/utils";
 
 const ARTICLES = [
   {
-    tag: "Compra",
-    title: "Qual potência de trator a sua operação pede?",
+    tag: "Vibração",
+    title: "Vibração fraca no rolo? Comece pelo circuito hidráulico",
     minutes: 4,
     body: [
-      "Potência demais custa caro na compra e no diesel; de menos, custa caro na janela de plantio. A conta começa pela largura do implemento mais pesado que você vai puxar: plantadeira de 11 linhas pede acima de 110 cv, grade de 28 discos pede acima de 100 cv, e colheita com carreta em rampa pede folga de uns 20%.",
-      "Para pecuária e pequenas propriedades, tratores de 75 a 90 cv resolvem roçada, carreta e serviço de curral com custo por hora baixo. Acima de 300 hectares de grãos, pense em 130 cv para cima, com transmissão que aguenta transporte.",
-      "No nosso pátio, os consultores cruzam talhão, implemento e relevo antes de indicar máquina — e se a conta fechar num usado de menor potência, a gente diz.",
+      "Quando o tambor perde amplitude, o primeiro suspeito é a bomba de vibração: vazão baixa não empurra o motor vibratório como deveria. Bombas Sundstrand e Sauer Danfoss, quando revisadas em bancada, voltam aos números de fábrica — e o laudo mostra isso antes de você pagar.",
+      "Antes de condenar a bomba, confira o básico: nível e estado do óleo hidráulico, filtro entupido, mangueiras ressecadas e coxins do módulo. Metade das 'bombas ruins' que chegam no balcão são filtro vencido e óleo velho.",
+      "Na dúvida, traga o rolo ou mande o modelo: a equipe técnica da Lusomaq indica o teste certo antes de vender a peça.",
     ],
   },
   {
-    tag: "Usados",
-    title: "Horas de uso: o que o horímetro diz (e o que esconde)",
+    tag: "Tambor",
+    title: "Duocone: a peça pequena que salva o tambor inteiro",
+    minutes: 3,
+    body: [
+      "O duocone veda o eixo do tambor contra poeira e umidade. Quando ele falha, o rolamento trabalha sujo — e rolamento de tambor não é peça barata nem rápida de trocar em campo.",
+      "Sinais de alerta: graxa saindo pela borda do tambor, pó fino acumulado no eixo e folga perceptível ao levantar o tambor com a pá. Na troca, limpe a sede com cuidado: assento arranhado mata o duocone novo em semanas.",
+      "É a peça que mais sai do nosso balcão — sempre tem no estoque, com medida certa para CA150 e CA250.",
+    ],
+  },
+  {
+    tag: "Motor",
+    title: "Perkins, MWM ou Deutz: manutenção que estica a vida",
     minutes: 5,
     body: [
-      "Hora de trator não é igual para todo trator: 1.000 h de pulverização leve valem menos desgaste que 1.000 h de grade pesada em solo argiloso. Por isso, horímetro baixo sozinho não é atestado de máquina nova — é ponto de partida.",
-      "O que confirma a história: notas de manutenção em sequência, folga de pedal e alavancas, cor de fumaça em aceleração fria, estado dos bicos e das mangueiras hidráulicas, e desgaste coerente de banco, volante e pneus com as horas declaradas.",
-      "Toda máquina usada da casa passa por checklist de 120 pontos antes de entrar no anúncio. As horas que aparecem no card são as mesmas do horímetro físico — você confere no pátio.",
+      "Motor de rolo trabalha em regime que caminhão não conhece: rotação constante, poeira constante e calor de esteira. Por isso, filtro de ar é a manutenção mais barata que existe — e a mais negligenciada. Elemento de segurança trocado no prazo evita poeira fina no cilindro.",
+      "Jogo de juntas merece atenção aos primeiros sinais de suor nas tampas: vazamento pequeno em motor quente vira poça e contamina correia e mangueira. Trocar o jogo completo sai mais barato que caçar vazamento depois.",
+      "Trabalhamos com as linhas Perkins, MWM, Mercedes, Kubota, Deutz e Cummins — do filtro ao motor completo.",
     ],
   },
   {
-    tag: "Checklist",
-    title: "12 pontos para conferir antes de fechar num usado",
-    minutes: 6,
-    body: [
-      "1) Horímetro compatível com desgaste geral. 2) Motor frio: partida em 1–2 giros, fumaça clara some rápido. 3) Sem vazamento ativo em juntas e mangueiras. 4) Transmissão sem estalo ou patinação nas trocas. 5) TDF engatando e desengatando limpa.",
-      "6) Hidráulica sustentando implemento levantado por 10 minutos sem ceder. 7) Folgas de eixo e terminal de direção dentro do limite. 8) Pneus com mais de 40% de vida e sem cortes profundos. 9) Cabine: ar gelando, vidros e comandos funcionando. 10) Estrutura sem solda 'artesanal' em chassi.",
-      "11) Documentação: nota de origem, nada-consta de alienação. 12) Teste de trabalho real, não só volta no pátio. Se o vendedor recusar qualquer um desses itens, agradeça e saia — máquina boa aceita vistoria.",
-    ],
-  },
-  {
-    tag: "Crédito",
-    title: "CDC, Finame ou consórcio: qual linha encaixa no seu fluxo",
-    minutes: 5,
-    body: [
-      "CDC é o caminho mais rápido: crédito direto, máquina na mão em dias, parcelas fixas — bom para quem tem pressa e entrada. Finame atende CNPJ com taxas subsidiadas e prazos longos, mas exige projeto e documentação em dia.",
-      "Consórcio é ferramenta de planejamento: sem juros, com contemplação por lance ou sorteio — funciona para renovar frota em 12–24 meses sem descapitalizar. Barter referenciada em sacas protege o fluxo de quem vive de safra.",
-      "Nossa mesa de crédito aciona mais de um banco e traz as propostas lado a lado. Você compara taxa, prazo e carência — a decisão é sua, sem empurrão.",
-    ],
-  },
-  {
-    tag: "Implementos",
-    title: "Implemento certo: casando a máquina com o talhão",
+    tag: "Rodado",
+    title: "Pneu de rolo pneumático: pressão é especificação de obra",
     minutes: 4,
     body: [
-      "Implemento subdimensionado desperdiça trator; superdimensionado força transmissão e bebe diesel. A regra prática: a exigência de potência do implemento deve ficar entre 70% e 90% da potência disponível na barra.",
-      "Para plantio direto consolidado, subsolador pontual e plantadeira com bom pantógrafo rendem mais que grade pesada todo ano. Em pastagem, roçadeira hidráulica e carreta de 10 t cobrem 90% da rotina.",
-      "Todos os implementos do pátio trazem a faixa de trator compatível no card (ex.: 90–140 cv). Na dúvida, mande a ficha do seu trator no WhatsApp que casamos o implemento.",
+      "Em compactação com pneumático, a pressão do pneu faz parte da receita da massa: pressão errada muda a pressão de contato e o grau de compactação medido no CBR. Não é detalhe — é especificação.",
+      "Na escolha do pneu, lona reforçada para trabalho contínuo compensa em base e sub-base, onde o rolo roda carregado o dia inteiro. E conferir cubo e rolamento na troca evita parar a obra por roda travada.",
+      "Goodyear e Continental nas medidas de rolo estão sempre no estoque — par ou jogo fechado com condição melhor.",
     ],
   },
   {
-    tag: "Manutenção",
-    title: "Manutenção de entressafra que evita parada na colheita",
+    tag: "Original × Compatível",
+    title: "Peça original ou compatível: quando cada uma vale a pena",
     minutes: 5,
     body: [
-      "Parada em colheita tem custo de hora cheia: grão no pé, frete contratado, janela fechando. A entressafra é o momento mais barato do ano para trocar correias, revisar rolamentos de rotor, calibrar plataformas e testar sensores de perda.",
-      "Em tratores, o pacote que salva safra: filtros e óleo no intervalo correto, teste de vazão hidráulica, reaperto de cardan e TDA, e verificação de bicos e bomba antes do plantio.",
-      "Nossa oficina agenda entressafra com hora marcada e devolve a máquina com o checklist assinado. Agende pelo WhatsApp antes da correria — a fila dobra em setembro.",
+      "Original é a escolha quando a especificação não admite conversa: bombas e motores hidráulicos calibrados, componentes internos de caixa e peças de segurança. Ali, o manual manda e a gente concorda.",
+      "Compatível de procedência é ferramenta de custo inteligente em itens de desgaste: duocones, retentores, filtros, correias, bicos e coxins. O segredo é a seleção — peça compatível sem marca conhecida é loteria.",
+      "No nosso balcão a regra é clara: dizemos qual é qual, qual marca está por trás e qual garantia acompanha. A decisão é sua, com a informação certa.",
+    ],
+  },
+  {
+    tag: "Logística",
+    title: "Obra parada custa caro: como antecipar a reposição",
+    minutes: 3,
+    body: [
+      "Peça de desgaste tem hora marcada para vencer — filtro, correia, bico, retentor. Montar um kit de reposição por rolo (dois filtros, jogo de correias, bicos reservas) custa pouco perto de um dia de usina parada.",
+      "Para frotas, fazemos orçamento fechado com separação de estoque por contrato: a peça já está reservada quando você liga. E o despacho sai com transporte próprio ou pela transportadora que chegar primeiro.",
+      "Mande a lista pelo site ou pelo WhatsApp — a condição para pedido fechado sempre compensa.",
     ],
   },
 ];
 
 export default function Contents() {
   usePageMeta(
-    `Conteúdos & Guias de Compra — ${BUSINESS.name}`,
-    "Guias práticos: como escolher potência de trator, avaliar horas de uso, checklist de máquina usada, financiamento, implementos e manutenção de entressafra.",
+    `Conteúdos técnicos — ${BUSINESS.name}`,
+    "Guias de manutenção para rolos compactadores: vibração, duocone, motores Perkins e MWM, pneus, peças originais e compatíveis, e logística de reposição.",
   );
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState(0);
+  const active = ARTICLES[open];
 
   return (
-    <div className="pt-[76px] lg:pt-[118px]">
+    <div className="pt-[120px] lg:pt-[150px]">
       <header className="border-b border-line-dark bg-coal-900">
         <div className="hazard-thin h-1.5 w-full opacity-60" aria-hidden="true" />
-        <div className="mx-auto max-w-(--container-site) px-6 py-14 md:py-20">
-          <Reveal><Kicker>Biblioteca do pátio</Kicker></Reveal>
+        <div className="mx-auto max-w-(--container-site) px-6 py-14">
+          <Reveal><Kicker>Conhecimento de balcão</Kicker></Reveal>
           <Reveal delay={80}>
-            <h1 className="mt-3 max-w-3xl font-display text-[clamp(2.4rem,6vw,4.5rem)] uppercase leading-[0.92]">
-              Antes de comprar, <span className="text-hz-400">leia isto</span>
+            <h1 className="mt-3 font-display text-[clamp(2.2rem,5.5vw,4rem)] uppercase leading-[0.95]">
+              Conteúdos <span className="text-hz-400">técnicos</span>
             </h1>
           </Reveal>
-          <Reveal delay={150}>
+          <Reveal delay={160}>
             <p className="mt-4 max-w-2xl text-lg text-steel-300">
-              Guias diretos, escritos por quem vende e revisa máquina todo dia. Sem enrolação de blog corporativo.
+              O que a gente explica no balcão todos os dias, agora por escrito — manutenção, escolha de peça e logística para quem vive de rolo.
             </p>
           </Reveal>
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-14 md:py-20">
-        {ARTICLES.map((a, i) => {
-          const isOpen = open === i;
-          return (
-            <Reveal key={a.title} delay={i * 60}>
-              <article className="border-b border-line-dark">
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  aria-expanded={isOpen}
-                  className="group flex w-full items-center justify-between gap-6 py-7 text-left"
-                >
-                  <div>
-                    <p className="font-cond text-[12px] font-bold uppercase tracking-[0.24em] text-hz-300">
-                      {a.tag} · {a.minutes} min de leitura
-                    </p>
-                    <h2 className="mt-2 font-display text-2xl uppercase leading-tight transition-colors group-hover:text-hz-300 md:text-3xl">
-                      {a.title}
-                    </h2>
-                  </div>
-                  <span
-                    className={cx(
-                      "grid h-12 w-12 shrink-0 place-items-center border font-display text-2xl transition-all duration-300",
-                      isOpen ? "rotate-45 border-hz-400 bg-hz-400 text-coal-950" : "border-line-dark text-steel-300 group-hover:border-hz-400 group-hover:text-hz-300",
-                    )}
-                    aria-hidden="true"
-                  >
-                    +
-                  </span>
-                </button>
-                <div className={cx("grid transition-all duration-500", isOpen ? "grid-rows-[1fr] pb-8 opacity-100" : "grid-rows-[0fr] opacity-0")}>
-                  <div className="overflow-hidden">
-                    {a.body.map((p, pi) => (
-                      <p key={pi} className="mb-4 max-w-3xl text-[15px] leading-relaxed text-steel-200">{p}</p>
-                    ))}
-                    <a href={waLink(BUSINESS.whatsapp, `Olá! Li o guia "${a.title}" no site e quero falar com um consultor.`)} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 font-cond text-[13px] font-bold uppercase tracking-[0.18em] text-hz-300 hover:text-hz-400">
-                      <IcWhatsApp size={16} /> Tirar dúvida sobre este assunto
-                    </a>
-                  </div>
-                </div>
-              </article>
-            </Reveal>
-          );
-        })}
+      <div className="mx-auto max-w-(--container-site) px-6 py-14">
+        <div className="grid gap-8 lg:grid-cols-[340px_1fr]">
+          <nav aria-label="Lista de conteúdos" className="space-y-2">
+            {ARTICLES.map((a, i) => (
+              <button
+                key={a.title}
+                onClick={() => setOpen(i)}
+                aria-pressed={open === i}
+                className={`w-full border px-4 py-3.5 text-left transition-all duration-200 ${
+                  open === i ? "border-hz-400 bg-hz-400/10" : "border-line-dark bg-coal-900 hover:border-steel-500"
+                }`}
+              >
+                <p className="font-cond text-[11px] font-bold uppercase tracking-[0.2em] text-hz-300">{a.tag} · {a.minutes} min</p>
+                <p className={`mt-1 font-display text-lg uppercase leading-tight ${open === i ? "text-hz-300" : "text-bone-100"}`}>{a.title}</p>
+              </button>
+            ))}
+          </nav>
 
-        <div className="mt-14 border border-line-dark bg-coal-900 p-8 text-center">
-          <SectionHead
-            align="center"
-            kicker="Aplicando no seu caso"
-            title={<>A teoria fica melhor <span className="text-hz-400">no pátio</span></>}
-          />
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Btn href={waLink(BUSINESS.whatsapp, generalMessage())} tone="hz"><IcWhatsApp size={17} /> Falar com consultor</Btn>
-            <Btn to="/maquinas" tone="outline">Ver máquinas <IcArrow size={16} /></Btn>
-          </div>
+          <Reveal key={active.title}>
+            <article className="border border-line-dark bg-coal-900 p-7 md:p-10">
+              <p className="font-cond text-[12px] font-bold uppercase tracking-[0.24em] text-hz-300">{active.tag} · leitura de {active.minutes} min</p>
+              <h2 className="mt-3 font-display text-3xl uppercase leading-tight md:text-4xl">{active.title}</h2>
+              <div className="mt-6 space-y-5">
+                {active.body.map((p) => (
+                  <p key={p.slice(0, 24)} className="text-[16px] leading-relaxed text-steel-200">{p}</p>
+                ))}
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3 border-t border-line-dark pt-6">
+                <Btn href={waLink(BUSINESS.whatsapp, `Olá! Li o conteúdo "${active.title}" no site da ${BUSINESS.name} e quero tirar uma dúvida.`)} tone="agri">
+                  <IcWhatsApp size={16} /> Tirar dúvida no WhatsApp
+                </Btn>
+                <Btn to="/pecas" tone="outline">Ver peças <IcArrow size={15} /></Btn>
+              </div>
+            </article>
+          </Reveal>
         </div>
+
+        <Reveal className="mt-12">
+          <div className="flex flex-wrap items-center justify-between gap-6 border border-line-dark bg-coal-900 p-7">
+            <div>
+              <Kicker>Sugestão de pauta?</Kicker>
+              <p className="mt-2 font-display text-2xl uppercase">Conta pra gente qual dúvida falta responder.</p>
+            </div>
+            <Btn href={waLink(BUSINESS.whatsapp, generalMessage())} tone="hz">Enviar sugestão</Btn>
+          </div>
+        </Reveal>
       </div>
     </div>
   );

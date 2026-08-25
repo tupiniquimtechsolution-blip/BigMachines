@@ -1,42 +1,60 @@
-# ASSET_SOURCES — Rastreabilidade de Assets
+# Rastreabilidade de Assets — LUSOMAQ
 
-> Regra de prioridade aplicada ao projeto:
-> **P1** conteúdo oficial da empresa → **P2** Instagram oficial → **P3** Google Maps → **P4** site oficial → **P5** placeholder.
->
-> ⚠️ **Status atual:** como o repositório não recebeu os dados da empresa real (Instagram/Google Maps/site),
-> **todos os assets visuais estão em P5 (placeholder gerado por IA, marcado para substituição)**.
-> As URLs abaixo são os placeholders vigentes — substitua pelos arquivos originais seguindo o
-> `CLIENT_REPLACEMENT_GUIDE.md`.
+Registro de origem de cada asset visual do site, conforme prioridade:
+**P1** conteúdo oficial da empresa · **P2** Instagram oficial · **P3** Google Maps · **P4** site oficial · **P5** placeholder.
 
-## Onde os assets são referenciados
+> Todas as imagens oficiais são servidas por hotlink direto do site da empresa
+> (`https://www.lusomaq.com.br/assets/...`). Antes de publicar, baixe os
+> arquivos e hospede em `public/client-assets/` (ver CLIENT_REPLACEMENT_GUIDE.md).
 
-Todos os caminhos de imagem vivem centralizados em `src/data/machines.ts` (constante `IMG`).
-Para trocar qualquer imagem do site inteiro, basta editar essa constante.
+## Identidade
 
-## Inventário
+| Asset | Origem | Link | Uso |
+|---|---|---|---|
+| logo-Ck6vucEm.png | P4 — site oficial | https://www.lusomaq.com.br/assets/logo-Ck6vucEm.png | Navbar, footer, favicon |
+| road-background-Bob74QJe.jpg | P4 — site oficial (fundo do hero original) | https://www.lusomaq.com.br/assets/road-background-Bob74QJe.jpg | Hero, storytelling, CTA final |
 
-| Asset (chave em `IMG`) | Tipo | Uso no site | Origem | Observação |
-|---|---|---|---|---|
-| `hero` | Imagem 1920×1080 | Hero, CTA final, fundo da linha do tempo | P5 — IA (qwenlm.ai/generated-images/7629fdd8…) | Substituir por vídeo real de trator em operação (poster atual) ou foto oficial do Instagram |
-| `forca` | Imagem 1600×900 | Storytelling "FORÇA", hotspots, galeria trator verde | P5 — IA (…/ee368c4e…) | Substituir por foto real de trator do estoque |
-| `produtividade` | Imagem 1600×900 | Storytelling "PRODUTIVIDADE", card da colheitadeira Case 4130 | P5 — IA (…/e1534e13…) | Substituir por tomada de drone real de colheita |
-| `tecnologia` | Imagem 1600×900 | Storytelling "TECNOLOGIA", galeria | P5 — IA (…/26144723…) | Substituir por foto real de cabine/painel |
-| `resultado` | Imagem 1600×900 | Storytelling "RESULTADO", cards (plantio/obra) | P5 — IA (…/b02296ab…) | Substituir por foto real de talhão pronto |
-| `tratorVerde` | Imagem 1280×853 | Cards John Deere/Valtra, tile "Tratores" | P5 — IA (…/1215dc3a…) | Substituir por foto de pátio de cada máquina (1 foto por máquina) |
-| `tratorVermelho` | Imagem 1280×853 | Cards NH/Case/MF | P5 — IA (…/6534fd8a…) | Idem — cada máquina merece a própria foto |
-| `escavadeira` | Imagem 1280×853 | Cards Caterpillar, tile "Escavadeiras" | P5 — IA (…/c578c028…) | Idem |
-| `retroescavadeira` | Imagem 1280×853 | Cards JCB, tile "Retroescavadeiras" | P5 — IA (…/6161c70d…) | Idem |
-| `patio` | Imagem 1600×900 | Seção "Pátio", header institucional | P5 — IA (…/313131ad…) | Substituir por foto real do pátio (Google Maps / Instagram) |
+## Hero & storytelling (PNGs oficiais do carrossel do site)
 
-## Fluxo recomendado para a empresa real
+| Asset | Uso no site |
+|---|---|
+| hero-1-DvT7Ydhf.png ("Peças para rolos compactadores") | Sobreposição do hero |
+| hero-2-BZlGxdRH.png ("Entrega rápida e eficiente") | Painel AGILIDADE |
+| hero-3-cxJApPb9.png ("Variedade e disponibilidade") | Painel ESTOQUE |
+| hero-5-PtPh9hy2.png ("Qualidade e confiabilidade") | Painel QUALIDADE |
+| hero-6-C_OXp637.png ("Peças originais e principais marcas") | Painel PREÇO JUSTO |
 
-1. Baixar fotos/vídeos do **Instagram oficial** (reels de máquinas trabalhando = hero/vídeo).
-2. Baixar fotos de fachada/pátio do **Google Maps**.
-3. Otimizar para WebP/AVIF (thumbnails ~120px de largura para cards, 1600px para hero).
-4. Substituir as URLs na constante `IMG` em `src/data/machines.ts`.
-5. Atualizar esta tabela com a origem real de cada asset.
+## Fotos de produtos (carrossel "Nossos Produtos" do site oficial — reais)
 
-## Conteúdo textual
+| Asset | Uso |
+|---|---|
+| 1-C58fN39r.jpg … 24-AvaEqN2H.png (24 fotos) | Cards do catálogo, famílias de peças, faixa de produtos, rolo por marca |
 
-- Dados comerciais (telefone, WhatsApp, endereço, equipe, CNPJ): `src/config/business.ts` — **fictícios**, marcados para substituição.
-- Máquinas e especificações: `src/data/machines.ts` — estoque **demonstrativo**; fichas técnicas seguem o formato real e devem ser preenchidas com os dados de cada unidade (o site só exibe campos presentes; nada é inventado em runtime).
+⚠ **IMPORTANTE:** os 24 itens de peças em `src/data/machines.ts` usam estas fotos reais,
+mas nomes, códigos (LM-XXXX) e preços são um **catálogo-exemplo**. Substitua pelos
+itens reais do estoque antes de publicar.
+
+## Instalações
+
+| Asset | Origem | Uso |
+|---|---|---|
+| predio-Dm1lldnl.jpg | P4 — site oficial (seção "Nossa Sede") | Página de contato e empresa |
+
+## Mapa
+
+| Asset | Origem | Uso |
+|---|---|---|
+| Embed Google Maps (lat -23.548194, lng -46.596889) | P3 — coordenadas do embed oficial do site | Página de contato |
+
+## Placeholder gerado (P5)
+
+| Asset | Origem | Uso | Substituição |
+|---|---|---|---|
+| rolo (seção "Anatomia do rolo") | Imagem gerada por IA — nenhum rolo real disponível | Hotspots interativos | Trocar por foto real de rolo em vista lateral do pátio/Instagram |
+
+## Pendências de conteúdo real (prioridade P2 — Instagram @lusomaq.tratores)
+
+- [ ] Foto lateral real de rolo compactador → substituir placeholder da Anatomia
+- [ ] Fotos de entregas e clientes (reels) → seção de prova social
+- [ ] Vídeo institucional para o hero (reel oficial)
+- [ ] Fotos individuais de cada peça do estoque real (substituir catálogo-exemplo)

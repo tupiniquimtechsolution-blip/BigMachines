@@ -1,89 +1,63 @@
-# Guia de Substituição para o Cliente
+# Guia de Publicação — proposta LUSOMAQ
 
-Checklist para transformar este site demonstrativo no site oficial da sua revenda.
-Quase tudo se resolve editando **3 arquivos** — sem tocar no restante do código.
+Checklist para transformar esta proposta no site oficial. Quase tudo se resolve
+editando **2 arquivos** (`src/config/business.ts` e `src/data/machines.ts`).
 
----
+## 1. Dados da empresa — `src/config/business.ts` (já preenchido com dados reais)
 
-## 1. Dados da empresa — `src/config/business.ts`
+- [ ] Confirmar/atualizar: `cnpj`, `phoneRaw`, WhatsApps da equipe, `hours`
+- [ ] Redes: `instagramUrl`, `facebookUrl`, `linkedinUrl` (já apontam para as reais)
+- [ ] `stats[]` — só números confirmados (hoje: 38 anos, 30.000+ itens, 1988, entrega Brasil)
+- [ ] `rollerBrands[]` / `partBrands[]` — listas extraídas do site oficial
 
-- [ ] `name`, `legalName`, `slogan`, `tagline`
-- [ ] `cnpj` (hoje: 00.000.000/0001-00)
-- [ ] Telefones: `phoneDisplay`, `phoneRaw`, `whatsapp` (formato 55 + DDD + número)
-- [ ] `email`
-- [ ] `address` (rua, complemento, cidade, UF, CEP) e `mapsLink` (rota real do Google Maps)
-- [ ] `hours` (horários de atendimento)
-- [ ] `instagram` / `instagramUrl` / `facebookUrl` / `youtubeUrl`
-- [ ] `team[]` — nome, área, telefone/WhatsApp e e-mail de cada vendedor (fotos: ver item 8)
-- [ ] `stats[]` — apenas números **confirmados** (anos, máquinas entregues, cidades, oficina)
-- [ ] `brands[]` — **somente marcas com as quais a empresa efetivamente trabalha**
+## 2. Estoque real — `src/data/machines.ts` ⚠ PRIORIDADE MÁXIMA
 
-## 2. Estoque de máquinas — `src/data/machines.ts`
+O catálogo atual é um **exemplo** com as famílias reais que a Lusomaq distribui.
+Para publicar:
 
-Cada máquina é um objeto em `MACHINES[]`:
-
-- [ ] `brand`, `model`, `year`, `category`, `condition` (novo/usado)
-- [ ] `status`: `disponivel` | `reservada` | `vendida` — vendida ganha tarja e some das CTAs de compra
-- [ ] `price` (null = "a consultar") e `priceWas` (para selo "redução de preço")
-- [ ] `hours`, `powerCv`, `weightKg`, `fuel`, `transmission`, `drive`
-- [ ] `badges[]`: Revisado / Único dono / Baixas horas / Pronta entrega / Oportunidade / Redução de preço — use só selos verdadeiros
-- [ ] `images[]` — fotos reais da unidade (mínimo 3: ¾ frente, lateral, cabine/horímetro)
-- [ ] `specGroups[]` — ficha técnica por grupo (Motor, Transmissão, Dimensões, Operação). **Campos ausentes simplesmente não aparecem** — nunca invente valores
-- [ ] `featured` — alimenta a seção "Oportunidades"
-- [ ] `slug` e `code` — slug gera a URL `/maquinas/[slug]`; code é o código de estoque (ex.: TF-0143)
-
-Implementos: edite `IMPLEMENTS[]` (tipo, marca, modelo, compatibilidade de trator, preço).
+- [ ] Substituir os 24 itens pelos itens reais (nome, código interno, aplicação, preço)
+- [ ] Cada item: `code` (código interno), `brand` (marca do rolo), `oem` (marca da peça),
+      `application` (modelos compatíveis), `price` (null = "sob consulta"),
+      `condition` ("original" | "compativel"), `status` ("disponivel" | "reservada" | "vendida")
+- [ ] `badges[]`: use apenas selos verdadeiros (Pronta entrega, Mais vendido, Testada em bancada)
+- [ ] `specGroups[]`: campos ausentes simplesmente não aparecem — nunca invente valores
+- [ ] Fotos: trocar URLs de hotlink por arquivos locais em `public/client-assets/machines/`
+- [ ] Motores (`IMPLEMENTS[]`): Perkins, MWM, Cummins, Deutz, Kubota, Mercedes (já reais)
 
 ## 3. Imagens — constante `IMG` em `src/data/machines.ts`
 
-Todas as imagens do site (hero, storytelling, cards, pátio) saem desta constante.
-- [ ] Substituir pelas fotos reais (ver `ASSET_SOURCES.md` para o mapa completo)
-- [ ] Preferir WebP/AVIF; ~1200–1900px de largura; vídeos com poster
+Hoje: hotlink do site oficial (P4). Para produção:
 
-## 4. Vídeos
+- [ ] Baixar `logo`, `road`, `predio`, `hero1–6`, `p1–p24` para `public/client-assets/`
+- [ ] Substituir `rolo` (placeholder IA) por foto real de rolo em vista lateral
 
-- [ ] Hero: substituir `IMG.hero` por um `<video>` com poster (reel de máquina trabalhando)
-- [ ] Máquina individual: campo pronto para evoluir — galeria aceita sequência de fotos (o selo "360°" já está preparado e só deve ser ativado com sequência fotográfica real)
+## 4. Formulários & WhatsApp
 
-## 5. WhatsApp & mensagens — `src/lib/utils.ts`
+Todos abrem o WhatsApp real com mensagem estruturada (nada de envio falso).
 
-- [ ] Ajustar os templates `machineMessage`, `financeMessage`, `quoteMessage`, `tradeMessage` ao tom da empresa
-- [ ] O número de destino vem de `business.whatsapp` (ou do vendedor, na página de contato)
+- [ ] `src/lib/utils.ts`: ajustar tom das mensagens (`machineMessage`, `quoteMessage`, etc.)
+- [ ] Para CRM/e-mail: conectar o `submit` de `QuoteModal` (overlays.tsx), `/orcamento` e
+      `/busca` (Forms.tsx) ao endpoint real
+- [ ] Upload de fotos em `/busca`: hoje o usuário anexa no próprio WhatsApp (honesto, sem backend)
 
-## 6. SEO
+## 5. SEO
 
-- [ ] `index.html`: title, description, JSON-LD (AutoDealer) com dados reais
-- [ ] Cada página gera title/description via `usePageMeta()` — textos em `SEO_COPY` (catálogo) e nos cabeçalhos
-- [ ] Schema.org Product é gerado automaticamente na página da máquina (preço/estoque só entram quando verdadeiros)
-- [ ] Substituir os textos de SEO local (`SEO_COPY`) citando cidade/bairro reais
+- [x] `index.html`: title/description/JSON-LD (AutoPartsStore) com dados reais
+- [x] JSON-LD Product dinâmico por peça (só entra preço/estoque quando verdadeiros)
+- [ ] Registrar domínio e apontar para a hospedagem
+- [ ] Google Business Profile já existe (coordenadas -23.548194, -46.596889)
 
-## 7. Formulários
+## 6. Evolução para painel administrativo
 
-Nenhum formulário "finge" envio: todos abrem o WhatsApp com a mensagem estruturada.
-- [ ] Para envio a um CRM/e-mail, conectar o `submit` de `QuoteModal`, `FinancingPage` e `TradeInPage` ao endpoint real
-- [ ] Upload de fotos na troca: hoje as fotos são anexadas pelo próprio usuário no WhatsApp (honesto, sem backend)
+A arquitetura separa dados (`src/data/machines.ts`) da interface:
+1. Criar tabela `parts` (Supabase/Postgres) com os mesmos campos do tipo `Machine`
+2. Trocar o import estático por fetch/cache (tipo TypeScript já definido)
+3. Catálogo, filtros, comparador e favoritos seguem funcionando sem mudança
 
-## 8. Conteúdos pendentes de material real
-
-- [ ] Fotos individuais de cada máquina do estoque (hoje há reaproveitamento de 5 fotos-base)
-- [ ] Fotos da equipe (hoje: avatares com iniciais)
-- [ ] Fotos da fachada/office (Google Maps)
-- [ ] Vídeo hero (reel oficial)
-- [ ] Seção "Antes/Depois" (só publicar com registros reais de serviço)
-- [ ] Efeito 360° (requer sequência de ~24 fotos da máquina em giratório)
-
-## 9. Evolução para painel administrativo
-
-A arquitetura já separa dados (`src/data/machines.ts`) da interface. Para um painel:
-1. Criar tabela `machines` (Supabase/Postgres) com os mesmos campos do tipo `Machine`
-2. Trocar o import estático por um fetch/cache (o tipo já está definido em TypeScript)
-3. Rotas de catálogo, filtros, comparador e favoritos seguem funcionando sem mudança
-
-## 10. Checklist final antes de publicar
+## 7. Checklist final
 
 - [ ] `npm run build` passando
 - [ ] Testar em 360 / 390 / 430 / 768 / 1024 / 1440 / 1920 px
-- [ ] WhatsApp abrindo com mensagem correta em cada contexto (máquina, financiamento, troca, orçamento)
-- [ ] Favoritos e comparador persistindo (localStorage)
-- [ ] `prefers-reduced-motion` respeitado (Lenis/GSAP desligados)
-- [ ] Nenhuma máquina vendida aparecendo como disponível
+- [ ] WhatsApp abrindo com mensagem correta em cada contexto
+- [ ] Peça "esgotada" sem CTA de compra (status `vendida`)
+- [ ] Nenhum dado inventado: preços, prazos e especificações confirmados

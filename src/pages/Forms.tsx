@@ -1,413 +1,357 @@
-import { useMemo, useRef, useState } from "react";
-import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { BUSINESS } from "../config/business";
 import { IMPLEMENTS, MACHINES } from "../data/machines";
-import { cx, formatBRL, generalMessage, tradeMessage, usePageMeta, waLink } from "../lib/utils";
-import { Btn, IcArrow, IcCheck, IcClock, IcPhone, IcPin, IcShield, IcWhatsApp, IcWrench, Kicker, Reveal, SectionHead } from "../components/ui";
+import { cx, financeMessage, generalMessage, tradeMessage, usePageMeta, waLink } from "../lib/utils";
+import { Btn, IcArrow, IcDoc, IcPhone, IcPin, IcSearch, IcTractor, IcWhatsApp, IcWrench, Kicker, Reveal, SectionHead } from "../components/ui";
 
 const inputCls =
-  "w-full border border-line-dark bg-coal-950 px-4 py-3 text-[15px] text-bone-100 placeholder:text-steel-500 transition-colors focus:border-hz-400 focus:outline-none";
-const labelCls = "mb-1.5 block font-cond text-[12px] font-semibold uppercase tracking-[0.2em] text-steel-300";
+  "w-full border border-line-dark bg-coal-800 px-4 py-3 text-[15px] text-bone-100 placeholder:text-steel-500 transition-colors focus:border-hz-400 focus:outline-none";
+const labelCls = "mb-1.5 block font-cond text-[12px] font-bold uppercase tracking-[0.18em] text-steel-300";
 
-function PageHeader({ kicker, title, sub }: { kicker: string; title: ReactNode; sub: string }) {
+function FormShell({ kicker, title, lead, children }: { kicker: string; title: React.ReactNode; lead: string; children: React.ReactNode }) {
   return (
-    <header className="border-b border-line-dark bg-coal-900">
-      <div className="hazard-thin h-1.5 w-full opacity-60" aria-hidden="true" />
-      <div className="mx-auto max-w-(--container-site) px-6 py-14 md:py-20">
-        <Reveal><Kicker>{kicker}</Kicker></Reveal>
-        <Reveal delay={80}><h1 className="mt-3 max-w-3xl font-display text-[clamp(2.4rem,6vw,4.5rem)] uppercase leading-[0.92]">{title}</h1></Reveal>
-        <Reveal delay={150}><p className="mt-4 max-w-2xl text-lg text-steel-300">{sub}</p></Reveal>
-      </div>
-    </header>
+    <div className="pt-[120px] lg:pt-[150px]">
+      <header className="border-b border-line-dark bg-coal-900">
+        <div className="hazard-thin h-1.5 w-full opacity-60" aria-hidden="true" />
+        <div className="mx-auto max-w-(--container-site) px-6 py-14">
+          <Reveal><Kicker>{kicker}</Kicker></Reveal>
+          <Reveal delay={80}><h1 className="mt-3 max-w-3xl font-display text-[clamp(2.2rem,5.5vw,4rem)] uppercase leading-[0.95]">{title}</h1></Reveal>
+          <Reveal delay={160}><p className="mt-4 max-w-2xl text-lg text-steel-300">{lead}</p></Reveal>
+        </div>
+      </header>
+      <div className="mx-auto max-w-(--container-site) px-6 py-14">{children}</div>
+    </div>
   );
 }
 
-function Avatar({ name }: { name: string }) {
-  const initials = name.split(" ").map((p) => p[0]).slice(0, 2).join("");
-  return (
-    <span className="grid h-16 w-16 shrink-0 place-items-center border border-hz-500/40 bg-coal-800 font-display text-2xl text-hz-300">
-      {initials}
-    </span>
-  );
-}
-
-/* ================= FINANCIAMENTO ================= */
+/* =============== /orcamento — pedido para frota =============== */
 
 export function FinancingPage() {
-  usePageMeta(
-    `Financiamento de Tratores e Máquinas — ${BUSINESS.name} | ${BUSINESS.address.city}/${BUSINESS.address.state}`,
-    "Simulação de financiamento de trator, colheitadeira e máquina pesada: CDC rural, Finame, consórcio e barter. Solicite pelo WhatsApp sem compromisso.",
-  );
-  const [params] = useSearchParams();
-  const preCode = params.get("maquina");
-  const machineOptions = useMemo(
-    () =>
-      MACHINES.filter((m) => m.status !== "vendida").map((m) => ({
-        value: `${m.brand} ${m.model} ${m.year} (${m.code})`,
-        label: `${m.brand} ${m.model} ${m.year} — ${m.price ? formatBRL(m.price) : "consultar"}`,
-        price: m.price,
-      })),
-    [],
-  );
-  const pre = machineOptions.find((o) => preCode && o.value.includes(preCode));
+  usePageMeta(`Orçamento para frota — ${BUSINESS.name}`, "Condição especial para pedidos fechados e frotas de rolos compactadores. Orçamento sem compromisso pelo WhatsApp.");
+  const [f, setF] = useState({ nome: "", telefone: "", rolo: "", pecas: "", cidade: "", mensagem: "" });
+  const [error, setError] = useState("");
 
-  const [f, setF] = useState({
-    name: "", phone: "", doc: "",
-    machine: pre?.value ?? "", value: pre?.price ? String(pre.price) : "",
-    down: "", term: "60", city: "", msg: "",
-  });
-  const [sent, setSent] = useState(false);
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const msg = [
-      "Olá! Quero uma SIMULAÇÃO DE FINANCIAMENTO:",
-      "",
-      `• Máquina: ${f.machine || "ainda não escolhi"}`,
-      f.value ? `• Valor estimado: R$ ${f.value}` : "",
-      f.down ? `• Entrada: R$ ${f.down}` : "",
-      `• Prazo desejado: ${f.term} meses`,
-      `• Cidade: ${f.city}`,
-      `• Contato: ${f.phone} (${f.name})`,
-      f.doc ? `• CPF/CNPJ: ${f.doc}` : "",
-      f.msg ? `• Obs: ${f.msg}` : "",
-      "",
-      "Pode me apresentar CDC, Finame ou consórcio?",
-    ].filter(Boolean).join("\n");
-    window.open(waLink(BUSINESS.whatsapp, msg), "_blank", "noopener");
-    setSent(true);
+  const submit = () => {
+    if (!f.nome.trim() || !f.telefone.trim() || !f.pecas.trim()) {
+      setError("Preencha ao menos nome, telefone e a lista de peças.");
+      return;
+    }
+    window.open(waLink(BUSINESS.whatsapp, financeMessage(f)), "_blank", "noopener");
   };
 
   return (
-    <div className="pt-[76px] lg:pt-[118px]">
-      <PageHeader
-        kicker="Financiamento & consórcio"
-        title={<>A máquina trabalha. <span className="text-hz-400">O capital respira.</span></>}
-        sub="Montamos a operação com as principais linhas do mercado. A simulação oficial vem da instituição financeira — aqui você não recebe promessa de taxa, recebe proposta."
-      />
-      <div className="mx-auto grid max-w-(--container-site) gap-12 px-6 py-14 md:py-20 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <Reveal>
-            <h2 className="font-display text-3xl uppercase">Como funciona</h2>
-            <ol className="mt-6 space-y-0">
-              {[
-                ["Envie a simulação", "Você escolhe a máquina, o prazo e a entrada. Leva 2 minutos."],
-                ["Análise de crédito", "Nossa mesa de crédito aciona os bancos parceiros em até 48h úteis."],
-                ["Assinatura e retirada", "Contrato assinado, máquina faturada e retirada no pátio — ou entregue na sua porteira."],
-              ].map(([t, d], i) => (
-                <li key={t} className="flex gap-5 border-l-2 border-line-dark pb-8 pl-6 last:pb-0" style={{ borderColor: i === 0 ? "var(--color-hz-400)" : undefined }}>
-                  <div>
-                    <p className="font-cond text-sm font-bold uppercase tracking-[0.2em] text-hz-300">Passo 0{i + 1}</p>
-                    <h3 className="mt-1 font-display text-xl uppercase">{t}</h3>
-                    <p className="mt-2 text-[14px] leading-relaxed text-steel-300">{d}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
+    <FormShell
+      kicker="Pedido fechado"
+      title={<>Orçamento para <span className="text-hz-400">frota & usina</span></>}
+      lead="Opera vários rolos ou mantém usina de asfalto? Mande a lista de peças e receba condição para pedido fechado — sem simulação de taxa, sem letra miúda: preço de balcão."
+    >
+      <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
+        <Reveal>
+          <div className="border border-line-dark bg-coal-900 p-7 md:p-9">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="o-nome" className={labelCls}>Nome *</label>
+                <input id="o-nome" className={inputCls} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} placeholder="Seu nome" />
+              </div>
+              <div>
+                <label htmlFor="o-tel" className={labelCls}>Telefone / WhatsApp *</label>
+                <input id="o-tel" className={inputCls} value={f.telefone} onChange={(e) => setF({ ...f, telefone: e.target.value })} placeholder="(11) 9…" />
+              </div>
+              <div>
+                <label htmlFor="o-cidade" className={labelCls}>Cidade / UF</label>
+                <input id="o-cidade" className={inputCls} value={f.cidade} onChange={(e) => setF({ ...f, cidade: e.target.value })} placeholder="Onde a frota opera" />
+              </div>
+              <div>
+                <label htmlFor="o-rolo" className={labelCls}>Rolos na frota</label>
+                <input id="o-rolo" className={inputCls} value={f.rolo} onChange={(e) => setF({ ...f, rolo: e.target.value })} placeholder="Ex.: 2× CA250, 1× Hamm 3410" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="o-pecas" className={labelCls}>Lista de peças *</label>
+                <textarea id="o-pecas" rows={5} className={inputCls} value={f.pecas} onChange={(e) => setF({ ...f, pecas: e.target.value })} placeholder={"Uma por linha. Ex.:\n2× bomba de vibração CA250\n4× filtro de ar CA150\n1× jogo de duocones"} />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="o-msg" className={labelCls}>Detalhes</label>
+                <textarea id="o-msg" rows={3} className={inputCls} value={f.mensagem} onChange={(e) => setF({ ...f, mensagem: e.target.value })} placeholder="Prazo, condição de pagamento, urgência…" />
+              </div>
+            </div>
+            {error && <p className="mt-4 font-cond text-[13px] font-bold uppercase tracking-[0.1em] text-safety-400" role="alert">{error}</p>}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Btn onClick={submit} size="lg">Enviar pelo WhatsApp <IcWhatsApp size={16} /></Btn>
+              <Btn to="/pecas" tone="outline" size="lg">Ver peças antes <IcArrow size={15} /></Btn>
+            </div>
+            <p className="mt-4 text-[12px] text-steel-500">O formulário abre seu WhatsApp com a lista já estruturada — você revisa antes de enviar.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={120}>
+          <aside className="space-y-5">
+            <div className="border border-agri-500/40 bg-coal-900 p-6">
+              <IcWrench size={26} className="text-agri-300" />
+              <h3 className="mt-3 font-display text-2xl uppercase">Por que pedido fechado?</h3>
+              <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-steel-300">
+                <li className="flex gap-2.5"><span className="mt-2 h-[2px] w-4 shrink-0 bg-agri-400" />Condição melhor que peça avulsa</li>
+                <li className="flex gap-2.5"><span className="mt-2 h-[2px] w-4 shrink-0 bg-agri-400" />Um frete só para tudo</li>
+                <li className="flex gap-2.5"><span className="mt-2 h-[2px] w-4 shrink-0 bg-agri-400" />Separamos o estoque por contrato</li>
+              </ul>
+            </div>
+            <div className="border border-line-dark bg-coal-900 p-6">
+              <IcDoc size={26} className="text-hz-300" />
+              <h3 className="mt-3 font-display text-2xl uppercase">Fale direto</h3>
+              <p className="mt-2 text-[14px] text-steel-300">Prefere voz? Liga no fixo que a mesa de orçamentos atende:</p>
+              <a href={`tel:+${BUSINESS.phoneRaw}`} className="mt-3 block font-cond text-xl font-bold text-hz-300 hover:underline">{BUSINESS.phoneDisplay}</a>
+              <p className="mt-1 font-cond text-[12px] uppercase tracking-[0.18em] text-steel-500">{BUSINESS.hours[0].days} · {BUSINESS.hours[0].time}</p>
+            </div>
+          </aside>
+        </Reveal>
+      </div>
+    </FormShell>
+  );
+}
 
-          <Reveal delay={120} className="mt-10">
-            <h3 className="font-cond text-sm font-bold uppercase tracking-[0.24em] text-bone-100">Linhas que operamos</h3>
-            <ul className="mt-4 divide-y divide-line-dark border border-line-dark">
-              {[
-                ["CDC rural", "Parcelas alinhadas ao ciclo da safra, com carência de até 180 dias."],
-                ["Finame / BNDES", "Para CNPJ, com taxas subsidiadas e prazos longos."],
-                ["Consórcio", "Planejamento sem juros: contemplação por lance ou sorteio."],
-                ["Barter", "Parcelas referenciadas em sacas — o campo paga a máquina."],
-              ].map(([t, d]) => (
-                <li key={t} className="flex items-start gap-3 p-4">
-                  <IcCheck size={17} className="mt-0.5 shrink-0 text-agri-400" />
-                  <div>
-                    <p className="font-cond text-[15px] font-bold uppercase tracking-[0.1em] text-bone-100">{t}</p>
-                    <p className="mt-0.5 text-[13px] leading-snug text-steel-400">{d}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 border border-hz-500/30 bg-hz-400/5 p-4 text-[13px] leading-relaxed text-steel-300">
-              <strong className="text-hz-300">Transparência:</strong> não exibimos taxas nem calculadoras de parcela neste site. Condições reais dependem de análise de crédito da instituição financeira.
+/* =============== /busca — não achou a peça =============== */
+
+export function TradeInPage() {
+  usePageMeta(`Não achou a peça? — ${BUSINESS.name}`, "Mais de 30.000 itens no estoque físico. Mande o código OEM ou uma foto da peça e a Lusomaq localiza para você.");
+  const [f, setF] = useState({ nome: "", telefone: "", codigo: "", rolo: "", descricao: "" });
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [error, setError] = useState("");
+
+  const submit = () => {
+    if (!f.nome.trim() || !f.telefone.trim() || (!f.codigo.trim() && !f.descricao.trim())) {
+      setError("Informe ao menos nome, telefone e o código ou uma descrição da peça.");
+      return;
+    }
+    window.open(waLink(BUSINESS.whatsapp, tradeMessage({ ...f, fotos: photos.length })), "_blank", "noopener");
+  };
+
+  return (
+    <FormShell
+      kicker="Caça-peças"
+      title={<>Não achou a peça? <span className="text-hz-400">A gente acha.</span></>}
+      lead="O site mostra só uma amostra — são mais de 30.000 itens no estoque físico. Mande o código OEM, o modelo do rolo ou uma foto da peça velha que nossa equipe localiza."
+    >
+      <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
+        <Reveal>
+          <div className="border border-line-dark bg-coal-900 p-7 md:p-9">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="b-nome" className={labelCls}>Nome *</label>
+                <input id="b-nome" className={inputCls} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} placeholder="Seu nome" />
+              </div>
+              <div>
+                <label htmlFor="b-tel" className={labelCls}>Telefone / WhatsApp *</label>
+                <input id="b-tel" className={inputCls} value={f.telefone} onChange={(e) => setF({ ...f, telefone: e.target.value })} placeholder="(11) 9…" />
+              </div>
+              <div>
+                <label htmlFor="b-cod" className={labelCls}>Código OEM / referência</label>
+                <input id="b-cod" className={inputCls} value={f.codigo} onChange={(e) => setF({ ...f, codigo: e.target.value })} placeholder="Ex.: 4700268419" />
+              </div>
+              <div>
+                <label htmlFor="b-rolo" className={labelCls}>Rolo / equipamento</label>
+                <input id="b-rolo" className={inputCls} value={f.rolo} onChange={(e) => setF({ ...f, rolo: e.target.value })} placeholder="Ex.: Dynapac CA250 2012" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="b-desc" className={labelCls}>Descreva a peça *</label>
+                <textarea id="b-desc" rows={4} className={inputCls} value={f.descricao} onChange={(e) => setF({ ...f, descricao: e.target.value })} placeholder="Onde vai, o que faz, medida aproximada…" />
+              </div>
+            </div>
+
+            {/* fotos */}
+            <div className="mt-5">
+              <p className={labelCls}>Fotos da peça (frente, lateral, código gravado)</p>
+              <label className="grid cursor-pointer place-items-center border border-dashed border-steel-500 bg-coal-950/60 px-6 py-8 text-center transition-colors hover:border-hz-400">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="sr-only"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? []);
+                    setPhotos((p) => [...p, ...files.map((file) => URL.createObjectURL(file))].slice(0, 8));
+                  }}
+                />
+                <IcSearch size={26} className="text-hz-300" />
+                <span className="mt-2 font-cond text-[13px] font-bold uppercase tracking-[0.18em] text-bone-100">Escolher fotos (até 8)</span>
+                <span className="mt-1 text-[12px] text-steel-500">Use-as como referência — depois anexe no WhatsApp</span>
+              </label>
+              {photos.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {photos.map((p, i) => (
+                    <img key={i} src={p} alt={`Foto da peça ${i + 1}`} className="h-16 w-16 border border-line-dark object-cover" />
+                  ))}
+                </div>
+              )}
+              <p className="mt-2 text-[12px] text-steel-500">
+                Como não temos upload direto no site ainda, envie as fotos na conversa do WhatsApp que vai abrir — leva 2 segundos.
+              </p>
+            </div>
+
+            {error && <p className="mt-4 font-cond text-[13px] font-bold uppercase tracking-[0.1em] text-safety-400" role="alert">{error}</p>}
+            <div className="mt-6">
+              <Btn onClick={submit} size="lg">Procurar minha peça <IcWhatsApp size={16} /></Btn>
+            </div>
+          </div>
+        </Reveal>
+        <Reveal delay={120}>
+          <aside className="space-y-5">
+            <div className="border border-line-dark bg-coal-900 p-6">
+              <IcTractor size={26} className="text-hz-300" />
+              <h3 className="mt-3 font-display text-2xl uppercase">Como funciona</h3>
+              <ol className="mt-3 space-y-3 text-[14px] leading-relaxed text-steel-300">
+                <li><strong className="font-cond text-bone-100">1.</strong> Você manda código, descrição ou foto;</li>
+                <li><strong className="font-cond text-bone-100">2.</strong> A equipe confere no estoque físico (30.000+ itens);</li>
+                <li><strong className="font-cond text-bone-100">3.</strong> Você recebe preço e prazo no WhatsApp;</li>
+                <li><strong className="font-cond text-bone-100">4.</strong> Fechou? A peça sai no próximo despacho.</li>
+              </ol>
+            </div>
+            <div className="border border-hz-500/40 bg-coal-900 p-6">
+              <h3 className="font-display text-2xl uppercase">Dica de balcão</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-steel-300">
+                Peça com código gravado é localizada mais rápido. Foto do horímetro e da plaqueta do rolo também ajuda a fechar a aplicação.
+              </p>
+            </div>
+          </aside>
+        </Reveal>
+      </div>
+    </FormShell>
+  );
+}
+
+/* =============== /contato =============== */
+
+export function ContactPage() {
+  usePageMeta(`Contato & localização — ${BUSINESS.name}`, `Fale com a ${BUSINESS.name}: WhatsApp, telefone e e-mail. Rua Sapucaia, 26 — Alto da Mooca, São Paulo/SP. Seg a sex, 8h às 18h.`);
+
+  return (
+    <div className="pt-[120px] lg:pt-[150px]">
+      <header className="border-b border-line-dark bg-coal-900">
+        <div className="hazard-thin h-1.5 w-full opacity-60" aria-hidden="true" />
+        <div className="mx-auto max-w-(--container-site) px-6 py-14">
+          <Reveal><Kicker>Balcão, telefone e WhatsApp</Kicker></Reveal>
+          <Reveal delay={80}>
+            <h1 className="mt-3 font-display text-[clamp(2.2rem,5.5vw,4rem)] uppercase leading-[0.95]">
+              Fale com um <span className="text-hz-400">especialista</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={160}>
+            <p className="mt-4 max-w-2xl text-lg text-steel-300">
+              {BUSINESS.team.length - 1} atendentes dedicados no WhatsApp, telefone fixo e e-mail. Resposta em horário comercial.
             </p>
           </Reveal>
         </div>
+      </header>
 
-        <Reveal variant="right" className="lg:col-span-3">
-          <form onSubmit={submit} className="border border-line-dark bg-coal-900 p-7 md:p-9">
-            <h2 className="font-display text-2xl uppercase">Solicitar simulação</h2>
-            <p className="mt-2 text-[14px] text-steel-400">A solicitação abre pronta no WhatsApp — sem cadastro, sem spam.</p>
-            {sent ? (
-              <div className="mt-8 border border-agri-500/40 bg-agri-500/5 p-6 text-center">
-                <IcCheck size={34} className="mx-auto text-agri-300" />
-                <h3 className="mt-3 font-display text-2xl uppercase">Simulação a caminho</h3>
-                <p className="mt-2 text-[14px] text-steel-300">Abrimos seu WhatsApp com os dados preenchidos. Confirme o envio e nossa mesa de crédito responde em horário comercial.</p>
-              </div>
-            ) : (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="fn-name" className={labelCls}>Nome *</label><input id="fn-name" required className={inputCls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Nome completo" /></div>
-                <div><label htmlFor="fn-phone" className={labelCls}>WhatsApp *</label><input id="fn-phone" required inputMode="tel" className={inputCls} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} placeholder="(00) 00000-0000" /></div>
-                <div>
-                  <label htmlFor="fn-machine" className={labelCls}>Máquina *</label>
-                  <select id="fn-machine" required className={inputCls} value={f.machine} onChange={(e) => setF({ ...f, machine: e.target.value, value: machineOptions.find((o) => o.value === e.target.value)?.price ? String(machineOptions.find((o) => o.value === e.target.value)?.price) : f.value })}>
-                    <option value="">Selecione a máquina</option>
-                    {machineOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    <option value="Ainda não escolhi">Ainda não escolhi — quero orientação</option>
-                  </select>
-                </div>
-                <div><label htmlFor="fn-value" className={labelCls}>Valor estimado (R$)</label><input id="fn-value" inputMode="numeric" className={inputCls} value={f.value} onChange={(e) => setF({ ...f, value: e.target.value.replace(/\D/g, "") })} placeholder="Ex.: 389000" /></div>
-                <div><label htmlFor="fn-down" className={labelCls}>Entrada (R$)</label><input id="fn-down" inputMode="numeric" className={inputCls} value={f.down} onChange={(e) => setF({ ...f, down: e.target.value.replace(/\D/g, "") })} placeholder="Opcional" /></div>
-                <div>
-                  <label htmlFor="fn-term" className={labelCls}>Prazo</label>
-                  <select id="fn-term" className={inputCls} value={f.term} onChange={(e) => setF({ ...f, term: e.target.value })}>
-                    {["24", "36", "48", "60", "72", "96"].map((t) => <option key={t} value={t}>{t} meses</option>)}
-                  </select>
-                </div>
-                <div><label htmlFor="fn-city" className={labelCls}>Cidade *</label><input id="fn-city" required className={inputCls} value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })} placeholder="Cidade/UF" /></div>
-                <div><label htmlFor="fn-doc" className={labelCls}>CPF/CNPJ (opcional)</label><input id="fn-doc" className={inputCls} value={f.doc} onChange={(e) => setF({ ...f, doc: e.target.value })} placeholder="Acelera a análise — não é obrigatório" /></div>
-                <div className="sm:col-span-2"><label htmlFor="fn-msg" className={labelCls}>Observações</label><textarea id="fn-msg" rows={3} className={inputCls} value={f.msg} onChange={(e) => setF({ ...f, msg: e.target.value })} placeholder="Carência, safra de referência, outro bem na operação…" /></div>
-                <div className="sm:col-span-2">
-                  <Btn type="submit" tone="agri" size="lg" className="w-full"><IcWhatsApp size={18} /> Solicitar simulação</Btn>
-                  <p className="mt-2 text-center text-[12px] text-steel-500">Suus dados seguem apenas para o WhatsApp da loja. CPF/CNPJ só é usado na análise, se você informar.</p>
-                </div>
-              </div>
-            )}
-          </form>
-        </Reveal>
-      </div>
-    </div>
-  );
-}
-
-/* ================= TROCA ================= */
-
-export function TradeInPage() {
-  usePageMeta(
-    `Dê sua Máquina na Troca — Avaliação de Usados | ${BUSINESS.name}`,
-    "Avaliamos seu trator ou máquina usada pelo estado real: horas, revisões, pneus e documentos. O valor vira entrada na próxima máquina.",
-  );
-  const [f, setF] = useState({ name: "", phone: "", brand: "", model: "", year: "", hours: "", state: "Bom", city: "", desc: "" });
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [sent, setSent] = useState(false);
-  const fileRef = useRef<HTMLInputElement | null>(null);
-
-  const onFiles = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []).slice(0, 8);
-    setPhotos(files.map((file) => URL.createObjectURL(file)));
-  };
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const msg = tradeMessage({ ...f, photos: photos.length });
-    window.open(waLink(BUSINESS.whatsapp, msg), "_blank", "noopener");
-    setSent(true);
-  };
-
-  return (
-    <div className="pt-[76px] lg:pt-[118px]">
-      <PageHeader
-        kicker="Troca inteligente"
-        title={<>Dê sua máquina <span className="text-safety-400">na troca</span></>}
-        sub="Usado bom não encalha: vira entrada. Descreva a máquina, anexe as fotos e receba a avaliação do nosso time — sem enrolação e sem proposta-clichê."
-      />
-      <div className="mx-auto grid max-w-(--container-site) gap-12 px-6 py-14 md:py-20 lg:grid-cols-5">
-        <Reveal variant="left" className="lg:col-span-2">
-          <h2 className="font-display text-3xl uppercase">O que olhamos na avaliação</h2>
-          <ul className="mt-6 space-y-4">
-            {[
-              [IcClock, "Horímetro & histórico", "Horas reais, horas de motor vs. trabalho pesado e notas de manutenção."],
-              [IcWrench, "Mecânica & hidráulica", "Motor, transmissão, bombas e vazamentos. Teste de carga na oficina."],
-              [IcShield, "Documentação", "Nota fiscal de origem, alienação e situação cadastral limpa."],
-              [IcCheck, "Rodado & estrutura", "Pneus, eixos, chassi, cabine e implementos que acompanham."],
-            ].map(([Icon, t, d]) => {
-              const Ic = Icon as typeof IcClock;
-              return (
-                <li key={t as string} className="flex gap-4 border border-line-dark bg-coal-900 p-5">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center bg-coal-800 text-safety-400"><Ic size={21} /></span>
-                  <div>
-                    <h3 className="font-cond text-[15px] font-bold uppercase tracking-[0.12em] text-bone-100">{t as string}</h3>
-                    <p className="mt-1 text-[13px] leading-relaxed text-steel-400">{d as string}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-6 border border-line-dark bg-coal-900 p-5 text-[14px] leading-relaxed text-steel-300">
-            Fotos que mais ajudam: <strong className="text-bone-100">frente, traseira, laterais, cabine, motor, horímetro e pneus</strong>. Pode ser do celular mesmo, com luz do dia.
-          </p>
-        </Reveal>
-
-        <Reveal variant="right" delay={100} className="lg:col-span-3">
-          <form onSubmit={submit} className="border border-line-dark bg-coal-900 p-7 md:p-9">
-            <h2 className="font-display text-2xl uppercase">Descreva sua máquina</h2>
-            {sent ? (
-              <div className="mt-8 border border-agri-500/40 bg-agri-500/5 p-6 text-center">
-                <IcCheck size={34} className="mx-auto text-agri-300" />
-                <h3 className="mt-3 font-display text-2xl uppercase">Avaliação solicitada</h3>
-                <p className="mx-auto mt-2 max-w-md text-[14px] leading-relaxed text-steel-300">
-                  Abrimos seu WhatsApp com a ficha preenchida{photos.length > 0 ? ` — agora anexe as ${photos.length} foto(s) na conversa` : ""}. Nosso avaliador responde em horário comercial.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="t-name" className={labelCls}>Seu nome *</label><input id="t-name" required className={inputCls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
-                <div><label htmlFor="t-phone" className={labelCls}>WhatsApp *</label><input id="t-phone" required inputMode="tel" className={inputCls} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} placeholder="(00) 00000-0000" /></div>
-                <div><label htmlFor="t-brand" className={labelCls}>Marca *</label><input id="t-brand" required className={inputCls} value={f.brand} onChange={(e) => setF({ ...f, brand: e.target.value })} placeholder="Ex.: John Deere" /></div>
-                <div><label htmlFor="t-model" className={labelCls}>Modelo *</label><input id="t-model" required className={inputCls} value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })} placeholder="Ex.: 6110J" /></div>
-                <div><label htmlFor="t-year" className={labelCls}>Ano *</label><input id="t-year" required inputMode="numeric" className={inputCls} value={f.year} onChange={(e) => setF({ ...f, year: e.target.value.replace(/\D/g, "").slice(0, 4) })} placeholder="2020" /></div>
-                <div><label htmlFor="t-hours" className={labelCls}>Horas de uso</label><input id="t-hours" inputMode="numeric" className={inputCls} value={f.hours} onChange={(e) => setF({ ...f, hours: e.target.value.replace(/\D/g, "") })} placeholder="Ex.: 3200" /></div>
-                <div>
-                  <label htmlFor="t-state" className={labelCls}>Estado de conservação *</label>
-                  <select id="t-state" className={inputCls} value={f.state} onChange={(e) => setF({ ...f, state: e.target.value })}>
-                    {["Excelente", "Bom", "Regular", "Precisando de reparo"].map((s) => <option key={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div><label htmlFor="t-city" className={labelCls}>Cidade *</label><input id="t-city" required className={inputCls} value={f.city} onChange={(e) => setF({ ...f, city: e.target.value })} placeholder="Cidade/UF" /></div>
-                <div className="sm:col-span-2"><label htmlFor="t-desc" className={labelCls}>Detalhes & implementos que acompanham</label><textarea id="t-desc" rows={3} className={inputCls} value={f.desc} onChange={(e) => setF({ ...f, desc: e.target.value })} placeholder="Revisões, único dono, piloto automático, plataforma…" /></div>
-
-                <div className="sm:col-span-2">
-                  <span className={labelCls}>Fotos da máquina (até 8)</span>
-                  <input ref={fileRef} type="file" accept="image/*" multiple onChange={onFiles} className="sr-only" aria-label="Selecionar fotos da máquina" />
-                  <button type="button" onClick={() => fileRef.current?.click()} className="w-full border border-dashed border-steel-500 px-4 py-6 text-center font-cond text-[13px] font-semibold uppercase tracking-[0.18em] text-steel-300 transition-colors hover:border-hz-400 hover:text-hz-300">
-                    {photos.length > 0 ? `${photos.length} foto(s) selecionada(s) — toque para trocar` : "Escolher fotos (frente, cabine, motor, horímetro, pneus…)"}
-                  </button>
-                  {photos.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {photos.map((p, i) => (
-                        <img key={i} src={p} alt={`Foto selecionada ${i + 1}`} className="h-16 w-20 border border-line-dark object-cover" />
-                      ))}
-                    </div>
-                  )}
-                  <p className="mt-2 text-[12px] leading-relaxed text-steel-500">
-                    Este formulário não envia as fotos por si só — elas viajam com você: ao confirmar, o WhatsApp abre com a ficha pronta e você anexa as imagens lá. Sem upload falso.
-                  </p>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <Btn type="submit" tone="safety" size="lg" className="w-full"><IcWhatsApp size={18} /> Pedir avaliação no WhatsApp</Btn>
-                </div>
-              </div>
-            )}
-          </form>
-        </Reveal>
-      </div>
-    </div>
-  );
-}
-
-/* ================= CONTATO ================= */
-
-export function ContactPage() {
-  usePageMeta(
-    `Contato & Pátio em ${BUSINESS.address.city}/${BUSINESS.address.state} — ${BUSINESS.name}`,
-    `Fale com um especialista em tratores e máquinas pesadas em ${BUSINESS.address.city}/${BUSINESS.address.state}. WhatsApp, telefone, endereço do pátio e horários de atendimento.`,
-  );
-  return (
-    <div className="pt-[76px] lg:pt-[118px]">
-      <PageHeader
-        kicker="Atendimento comercial"
-        title={<>Fale com um <span className="text-hz-400">especialista</span></>}
-        sub="Cada linha de máquina tem um consultor dedicado. Escolha a área, chame direto — sem central, sem robô, sem espera."
-      />
-
-      <div className="mx-auto max-w-(--container-site) px-6 py-14 md:py-20">
-        <div className="grid gap-6 md:grid-cols-3">
-          {BUSINESS.team.map((p, i) => (
-            <Reveal key={p.name} delay={i * 90}>
-              <div className="flex h-full flex-col border border-line-dark bg-coal-900 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-steel-500 hover:shadow-plate">
-                <div className="flex items-center gap-4">
-                  <Avatar name={p.name} />
-                  <div>
-                    <h2 className="font-display text-2xl uppercase leading-none">{p.name}</h2>
-                    <p className="mt-1.5 font-cond text-[12px] font-semibold uppercase tracking-[0.18em] text-hz-300">{p.role}</p>
-                  </div>
-                </div>
-                <ul className="mt-6 space-y-2.5 text-[14px] text-steel-300">
-                  <li className="flex items-center gap-2.5"><IcPhone size={15} className="text-hz-400" /> {p.phoneDisplay}</li>
-                  <li className="flex items-center gap-2.5"><IcWhatsApp size={15} className="text-agri-400" /> {p.phoneDisplay}</li>
-                  <li className="flex items-center gap-2.5 break-all"><IcPin size={15} className="text-steel-400" /> {p.email}</li>
-                </ul>
-                <div className="mt-auto grid grid-cols-2 gap-2 pt-6">
-                  <Btn href={waLink(p.whatsapp, `Olá ${p.name.split(" ")[0]}! Vim pelo site da ${BUSINESS.name} e quero falar sobre máquinas.`)} tone="agri" size="sm">
-                    <IcWhatsApp size={15} /> WhatsApp
-                  </Btn>
-                  <Btn href={`tel:+${p.whatsapp}`} tone="dark" size="sm">
-                    <IcPhone size={15} /> Ligar
-                  </Btn>
-                </div>
-              </div>
+      <div className="mx-auto max-w-(--container-site) px-6 py-14">
+        {/* equipe */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {BUSINESS.team.map((t, i) => (
+            <Reveal key={t.whatsapp} delay={i * 80}>
+              <a
+                href={waLink(t.whatsapp, generalMessage())}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex h-full flex-col border border-line-dark bg-coal-900 p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-steel-500 hover:shadow-plate"
+              >
+                <span className={cx("grid h-14 w-14 place-items-center font-display text-xl uppercase", i === 0 ? "bg-hz-400 text-coal-950" : "bg-coal-700 text-bone-100")}>
+                  {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                </span>
+                <h3 className="mt-4 font-display text-xl uppercase">{t.name}</h3>
+                <p className="mt-1 font-cond text-[12px] font-semibold uppercase tracking-[0.18em] text-steel-400">{t.role}</p>
+                <p className="mt-auto pt-4 font-cond text-[15px] font-bold text-hz-300 transition-colors group-hover:text-hz-400">{t.phoneDisplay}</p>
+                <span className="mt-1 inline-flex items-center gap-2 font-cond text-[12px] font-bold uppercase tracking-[0.16em] text-agri-300">
+                  <IcWhatsApp size={14} /> Chamar no WhatsApp
+                </span>
+              </a>
             </Reveal>
           ))}
         </div>
 
-        {/* pátio / mapa */}
-        <div className="mt-20 grid overflow-hidden border border-line-dark bg-coal-900 lg:grid-cols-2">
-          <div className="relative min-h-[340px]">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(143,150,138,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(143,150,138,0.12) 1px, transparent 1px)",
-                backgroundSize: "36px 36px",
-                backgroundColor: "var(--color-coal-950)",
-              }}
-              aria-hidden="true"
-            />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-              <span className="relative mx-auto block h-5 w-5">
-                <span className="absolute inset-0 animate-ping bg-hz-400/60" aria-hidden="true" />
-                <span className="relative block h-5 w-5 rotate-45 border-2 border-hz-400 bg-coal-950" aria-hidden="true" />
-              </span>
-              <p className="mt-4 font-cond text-sm font-bold uppercase tracking-[0.22em] text-bone-100">{BUSINESS.name}</p>
-              <p className="mt-1 font-cond text-[12px] uppercase tracking-[0.18em] text-steel-400">Rod. Anhanguera, km 308</p>
-              <a
-                href={BUSINESS.mapsLink}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-2 bg-hz-400 px-4 py-2.5 font-cond text-[12px] font-bold uppercase tracking-[0.16em] text-coal-950 transition-colors hover:bg-hz-300"
-              >
-                Abrir rota no Google Maps <IcArrow size={14} />
-              </a>
-            </div>
-            <span className="absolute bottom-3 left-3 bg-coal-950/85 px-3 py-1.5 font-cond text-[11px] uppercase tracking-[0.18em] text-steel-400">
-              Mapa ilustrativo — use o botão para a rota real
-            </span>
-          </div>
-          <div className="p-8 md:p-10">
-            <Kicker>Visite nosso pátio</Kicker>
-            <h2 className="mt-3 font-display text-3xl uppercase leading-tight md:text-4xl">
-              {BUSINESS.address.street}
-            </h2>
-            <p className="mt-2 text-[15px] text-steel-300">
-              {BUSINESS.address.complement} — {BUSINESS.address.city}/{BUSINESS.address.state}, CEP {BUSINESS.address.zip}
-            </p>
-            <dl className="mt-7 divide-y divide-line-dark border-y border-line-dark">
-              {BUSINESS.hours.map((h) => (
-                <div key={h.days} className="flex items-center justify-between py-3">
-                  <dt className="font-cond text-[14px] font-semibold uppercase tracking-[0.14em] text-steel-300">{h.days}</dt>
-                  <dd className={cx("font-cond text-[14px] font-bold uppercase tracking-[0.14em]", h.time === "Fechado" ? "text-safety-400" : "text-bone-100")}>{h.time}</dd>
-                </div>
-              ))}
-              <div className="flex items-center justify-between py-3">
-                <dt className="font-cond text-[14px] font-semibold uppercase tracking-[0.14em] text-steel-300">Telefone</dt>
-                <dd><a href={`tel:+${BUSINESS.phoneRaw}`} className="font-cond text-[14px] font-bold uppercase tracking-[0.14em] text-hz-300 hover:text-hz-400">{BUSINESS.phoneDisplay}</a></dd>
+        <div className="mt-14 grid gap-8 lg:grid-cols-2">
+          {/* dados */}
+          <Reveal>
+            <div className="h-full border border-line-dark bg-coal-900 p-7 md:p-9">
+              <h2 className="font-display text-3xl uppercase">Informações<span className="text-hz-400">.</span></h2>
+              <ul className="mt-6 space-y-5 text-[15px]">
+                <li className="flex gap-4">
+                  <IcPin size={20} className="mt-0.5 shrink-0 text-hz-300" />
+                  <div>
+                    <p className="font-cond text-[12px] font-bold uppercase tracking-[0.2em] text-steel-500">Endereço</p>
+                    <p className="mt-1 text-bone-100">{BUSINESS.address.street}</p>
+                    <p className="text-steel-300">{BUSINESS.address.city}/{BUSINESS.address.state} — CEP {BUSINESS.address.zip}</p>
+                    <a href={BUSINESS.mapsLink} target="_blank" rel="noreferrer" className="mt-1 inline-block font-cond text-[13px] font-bold uppercase tracking-[0.16em] text-hz-300 hover:underline">
+                      Traçar rota →
+                    </a>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <IcPhone size={20} className="mt-0.5 shrink-0 text-hz-300" />
+                  <div>
+                    <p className="font-cond text-[12px] font-bold uppercase tracking-[0.2em] text-steel-500">Telefone fixo</p>
+                    <a href={`tel:+${BUSINESS.phoneRaw}`} className="mt-1 block text-bone-100 hover:text-hz-300">{BUSINESS.phoneDisplay}</a>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <IcWhatsApp size={20} className="mt-0.5 shrink-0 text-hz-300" />
+                  <div>
+                    <p className="font-cond text-[12px] font-bold uppercase tracking-[0.2em] text-steel-500">WhatsApp</p>
+                    <p className="mt-1 text-bone-100">{BUSINESS.whatsappDisplay} (principal)</p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <IcDoc size={20} className="mt-0.5 shrink-0 text-hz-300" />
+                  <div>
+                    <p className="font-cond text-[12px] font-bold uppercase tracking-[0.2em] text-steel-500">E-mail</p>
+                    <a href={`mailto:${BUSINESS.email}`} className="mt-1 block text-bone-100 hover:text-hz-300">{BUSINESS.email}</a>
+                  </div>
+                </li>
+              </ul>
+              <div className="mt-7 border-t border-line-dark pt-5">
+                <p className="font-cond text-[12px] font-bold uppercase tracking-[0.2em] text-steel-500">Horário de atendimento</p>
+                {BUSINESS.hours.map((h) => (
+                  <p key={h.days} className="mt-1 flex justify-between gap-4 text-[14px]">
+                    <span className="text-steel-300">{h.days}</span>
+                    <span className="font-cond font-bold text-bone-100">{h.time}</span>
+                  </p>
+                ))}
               </div>
-            </dl>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Btn href={waLink(BUSINESS.whatsapp, generalMessage())} tone="agri"><IcWhatsApp size={16} /> Chamar no WhatsApp</Btn>
-              <Btn to="/maquinas" tone="outline">Ver estoque antes de vir</Btn>
             </div>
-          </div>
+          </Reveal>
+
+          {/* mapa + fachada */}
+          <Reveal delay={120}>
+            <div className="flex h-full flex-col gap-6">
+              <div className="min-h-[320px] flex-1 overflow-hidden border border-line-dark">
+                <iframe
+                  title={`Mapa — ${BUSINESS.name}`}
+                  src={BUSINESS.mapsEmbed}
+                  className="h-full min-h-[320px] w-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+              <div className="relative overflow-hidden border border-line-dark">
+                <img src="https://www.lusomaq.com.br/assets/predio-Dm1lldnl.jpg" alt={`Fachada da sede da ${BUSINESS.name} no Alto da Mooca`} loading="lazy" className="h-52 w-full object-cover" />
+                <span className="absolute bottom-3 left-3 bg-coal-950/85 px-3 py-1.5 font-cond text-[12px] font-bold uppercase tracking-[0.18em] text-bone-100">
+                  Nossa sede — Alto da Mooca
+                </span>
+              </div>
+            </div>
+          </Reveal>
         </div>
 
+        {/* CTA */}
         <Reveal className="mt-14">
-          <SectionHead
-            kicker="Implementos em destaque"
-            title={<>Já que está por aqui…</>}
-            lead={`Temos ${IMPLEMENTS.length} implementos no pátio agora — e mais ${MACHINES.filter((m) => m.status === "disponivel").length} máquinas disponíveis em 5 categorias.`}
-          />
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Btn to="/implementos" tone="hz">Ver implementos</Btn>
-            <Btn to="/usados" tone="outline">Usados selecionados</Btn>
-            <Btn to="/novos" tone="outline">Máquinas novas</Btn>
+          <div className="flex flex-wrap items-center justify-between gap-6 border border-line-dark bg-coal-900 p-8">
+            <div>
+              <p className="font-cond text-[13px] font-bold uppercase tracking-[0.24em] text-hz-300">Pronto para cotar?</p>
+              <h2 className="mt-2 font-display text-3xl uppercase">
+                {IMPLEMENTS.length + MACHINES.filter((m) => m.status === "disponivel").length} itens no catálogo online — e 30.000+ no estoque
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Btn href={waLink(BUSINESS.whatsapp, generalMessage())} size="lg" tone="agri"><IcWhatsApp size={17} /> WhatsApp</Btn>
+              <Btn to="/pecas" tone="outline" size="lg">Ver peças <IcArrow size={15} /></Btn>
+            </div>
           </div>
         </Reveal>
       </div>

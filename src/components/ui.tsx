@@ -295,9 +295,9 @@ export function HazardStrip({ className }: { className?: string }) {
 
 export function StatusTag({ status }: { status: "disponivel" | "reservada" | "vendida" }) {
   const map = {
-    disponivel: { label: "Disponível", cls: "bg-agri-500/15 text-agri-300 border-agri-500/40" },
+    disponivel: { label: "Em estoque", cls: "bg-agri-500/15 text-agri-300 border-agri-500/40" },
     reservada: { label: "Reservada", cls: "bg-hz-400/10 text-hz-300 border-hz-500/40" },
-    vendida: { label: "Vendida", cls: "bg-safety-500/10 text-safety-400 border-safety-500/40" },
+    vendida: { label: "Esgotada", cls: "bg-safety-500/10 text-safety-400 border-safety-500/40" },
   } as const;
   const s = map[status];
   return (

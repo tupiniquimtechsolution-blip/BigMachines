@@ -84,7 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quoteLabel,
       openQuote: (m, label) => {
         setQuoteMachine(m);
-        setQuoteLabel(label ?? (m ? `${m.brand} ${m.model} ${m.year} (${m.code})` : ""));
+        setQuoteLabel(label ?? (m ? `${m.model} — ${m.brand} (${m.code})` : ""));
       },
       closeQuote: () => {
         setQuoteMachine(null);

@@ -1,9 +1,9 @@
 /**
- * CONFIGURAÇÃO CENTRAL DO NEGÓCIO
+ * CONFIGURAÇÃO CENTRAL DO NEGÓCIO — LUSOMAQ
  * ------------------------------------------------------------------
- * Substitua pelos dados reais da empresa antes de publicar.
- * Todos os contatos de WhatsApp usam o formato internacional (55 + DDD + número).
- * Veja CLIENT_REPLACEMENT_GUIDE.md para o checklist completo.
+ * Dados extraídos do site oficial (lusomaq.com.br) em 2026.
+ * Todos os WhatsApp usam formato internacional (55 + DDD + número).
+ * Checklist de atualização em CLIENT_REPLACEMENT_GUIDE.md.
  */
 
 export interface Salesperson {
@@ -11,85 +11,109 @@ export interface Salesperson {
   role: string;
   phoneDisplay: string;
   whatsapp: string;
-  email: string;
 }
 
 export const BUSINESS = {
-  name: "TerraForte Máquinas",
-  legalName: "TerraForte Comércio de Máquinas e Tratores Ltda.",
-  slogan: "Máquinas que movem resultados",
+  name: "Lusomaq",
+  legalName: "Lusomaq Peças para Tratores",
+  slogan: "Líder em peças para rolos compactadores",
   tagline:
-    "Tratores, implementos e maquinário pesado para agricultura, construção e operações profissionais.",
-  founded: 1999,
-  cnpj: "00.000.000/0001-00", // substituir pelo CNPJ real
+    "Peças novas originais e compatíveis para rolos compactadores e equipamentos de pavimentação, terraplanagem e construção.",
+  founded: 1988,
+  yearsInMarket: 38,
+  cnpj: "", // confirmar com a empresa
 
-  phoneDisplay: "(16) 3911-4800",
-  phoneRaw: "551639114800",
-  whatsapp: "5516991184800",
-  whatsappDisplay: "(16) 99118-4800",
-  email: "vendas@terrafortemaquinas.com.br",
+  phoneDisplay: "(11) 2914-6213",
+  phoneRaw: "551129146213",
+  whatsapp: "5511932173836",
+  whatsappDisplay: "(11) 93217-3836",
+  email: "contato@lusomaq.com.br",
 
   address: {
-    street: "Rod. Anhanguera, km 308 — Distrito Industrial",
-    complement: "Pátio com 12.000 m² às margens da rodovia",
-    city: "Ribeirão Preto",
+    street: "Rua Sapucaia, nº 26 — Alto da Mooca",
+    complement: "Sede com estoque próprio e balcão de atendimento",
+    city: "São Paulo",
     state: "SP",
-    zip: "14000-000",
+    zip: "03170-050",
   },
-  mapsLink:
-    "https://www.google.com/maps/search/?api=1&query=concession%C3%A1ria+de+tratores+Ribeir%C3%A3o+Preto+SP",
+  geo: { lat: -23.548194, lng: -46.596889 },
+  mapsLink: "https://www.google.com/maps/search/?api=1&query=-23.548194,-46.596889",
+  mapsEmbed:
+    "https://maps.google.com/maps?q=-23.548194,-46.596889&z=16&output=embed",
 
   hours: [
-    { days: "Segunda a sexta", time: "07h30 — 18h00" },
-    { days: "Sábado", time: "08h00 — 12h30" },
-    { days: "Domingo", time: "Fechado" },
+    { days: "Segunda a sexta", time: "08h00 — 18h00" },
+    { days: "Sábado e domingo", time: "Fechado" },
   ],
 
-  instagram: "@terrafortemaquinas",
-  instagramUrl: "https://instagram.com/",
-  facebookUrl: "https://facebook.com/",
-  youtubeUrl: "https://youtube.com/",
+  siteUrl: "https://www.lusomaq.com.br/",
+  logoUrl: "https://www.lusomaq.com.br/assets/logo-Ck6vucEm.png",
+
+  instagram: "@lusomaq.tratores",
+  instagramUrl: "https://www.instagram.com/lusomaq.tratores/",
+  facebookUrl: "https://www.facebook.com/lusomaqpecastratores",
+  linkedinUrl: "https://www.linkedin.com/company/lusomaq-pe%C3%A7as-tratores/",
 
   team: [
-    {
-      name: "Ricardo Almeida",
-      role: "Tratores & Colheitadeiras",
-      phoneDisplay: "(16) 99118-2210",
-      whatsapp: "5516991182210",
-      email: "ricardo@terrafortemaquinas.com.br",
-    },
-    {
-      name: "João Pedro Sales",
-      role: "Linha Pesada & Construção",
-      phoneDisplay: "(16) 99118-2211",
-      whatsapp: "5516991182211",
-      email: "joao@terrafortemaquinas.com.br",
-    },
-    {
-      name: "Marina Duarte",
-      role: "Implementos, Peças & Financiamento",
-      phoneDisplay: "(16) 99118-2212",
-      whatsapp: "5516991182212",
-      email: "marina@terrafortemaquinas.com.br",
-    },
+    { name: "Atendimento Principal", role: "Orçamentos & pedidos", phoneDisplay: "(11) 93217-3836", whatsapp: "5511932173836" },
+    { name: "João Victor", role: "Vendas — peças de rolo", phoneDisplay: "(11) 96913-9923", whatsapp: "5511969139923" },
+    { name: "João Pires", role: "Vendas — motores & hidráulica", phoneDisplay: "(11) 97012-2776", whatsapp: "5511970122776" },
+    { name: "Camila", role: "Vendas & logística", phoneDisplay: "(11) 98542-2741", whatsapp: "5511985422741" },
   ] as Salesperson[],
 
   stats: [
-    { label: "Anos de estrada", value: 26, suffix: "" },
-    { label: "Máquinas entregues", value: 1850, suffix: "+" },
-    { label: "Cidades atendidas", value: 320, suffix: "+" },
-    { label: "Oficina própria", value: 1200, suffix: " m²" },
+    { label: "Anos de mercado", value: 38, suffix: "" },
+    { label: "Itens em estoque", value: 30000, suffix: "+" },
+    { label: "Fundada em", value: 1988, suffix: "" },
+    { label: "Entrega", value: 100, suffix: "% Brasil" },
   ],
 
-  /** Exiba apenas marcas com as quais a empresa efetivamente trabalha */
-  brands: [
-    "John Deere",
-    "Case IH",
-    "New Holland",
-    "Valtra",
-    "Massey Ferguson",
+  mission:
+    "Atendimento com excelência para entregar produtos com qualidade, preço justo e agilidade que superem as expectativas e necessidades dos nossos clientes.",
+  vision:
+    "Ser referência em qualidade e excelência no atendimento ao cliente, promovendo soluções com agilidade e preço justo. Expandir nossa atuação no mercado internacional.",
+  values: ["Foco no cliente", "Respeito", "Ética", "Qualidade", "Integridade"],
+
+  /** Marcas de rolos compactadores atendidas (site oficial) */
+  rollerBrands: [
+    "Dynapac",
+    "Muller",
+    "Hamm",
+    "Tema-Terra",
     "Caterpillar",
-    "JCB",
+    "Bomag",
+    "Volvo",
+    "Sany",
     "XCMG",
+    "Bobcat",
+    "Komatsu",
+    "Case",
+  ],
+
+  /** Marcas de peças e motores distribuídas (site oficial) */
+  partBrands: [
+    "Perkins",
+    "MWM",
+    "Mercedes-Benz",
+    "Kubota",
+    "Deutz",
+    "Cummins",
+    "Eaton",
+    "Sundstrand",
+    "Sauer Danfoss",
+    "Parker",
+    "SKF",
+    "Timken",
+    "FAG",
+    "NTN",
+    "Sabó",
+    "Donaldson",
+    "Fleetguard",
+    "Mann-Filter",
+    "Gates",
+    "Goodyear",
+    "Continental",
+    "Corpas",
+    "Silenmak",
   ],
 } as const;

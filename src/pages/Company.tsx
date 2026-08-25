@@ -4,21 +4,21 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BUSINESS } from "../config/business";
 import { availableCount, IMG } from "../data/machines";
 import { generalMessage, prefersReducedMotion, usePageMeta, waLink } from "../lib/utils";
-import { Btn, Counter, IcArrow, IcShield, IcTractor, IcWhatsApp, IcWrench, Kicker, Reveal, SectionHead } from "../components/ui";
+import { Btn, Counter, HazardStrip, IcArrow, IcShield, IcTractor, IcWhatsApp, IcWrench, Kicker, Reveal, SectionHead } from "../components/ui";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const MILESTONES = [
-  { year: "1999", text: "Família Almeida abre a primeira revenda de tratores usados no distrito industrial." },
-  { year: "2008", text: "Oficina própria: máquinas passam a sair revisadas com checklist assinado." },
-  { year: "2016", text: "Chegada da linha pesada — escavadeiras e retroescavadeiras para construção e prefeitura." },
-  { year: "2024", text: "1.850ª máquina entregue e pátio ampliado para 12.000 m² às margens da Anhanguera." },
+  { year: "1988", text: "Nasce a Lusomaq, distribuindo peças de reposição para rolos compactadores em São Paulo." },
+  { year: "Anos 2000", text: "Consolidação com motores Perkins, MWM, Mercedes, Kubota, Deutz e Cummins na carteira." },
+  { year: "Hoje", text: "Estoque próprio com mais de 30.000 itens e transporte próprio atendendo todo o Brasil." },
+  { year: "Próximo", text: "Expansão da atuação para o mercado internacional — como manda a nossa visão." },
 ];
 
 export default function Company() {
   usePageMeta(
-    `A Empresa — ${BUSINESS.name} | Tratores e Máquinas Pesadas`,
-    `Desde ${BUSINESS.founded} vendendo tratores, colheitadeiras e máquinas pesadas com procedência em ${BUSINESS.address.city}/${BUSINESS.address.state}. Pátio próprio, oficina e time comercial dedicado.`,
+    `A Empresa — ${BUSINESS.name} | Peças para Rolos Compactadores desde ${BUSINESS.founded}`,
+    `Fundada em ${BUSINESS.founded}, a ${BUSINESS.name} distribui peças para rolos compactadores Dynapac, Muller, Hamm, Tema-Terra, Caterpillar e Bomag. Estoque com 30.000+ itens em São Paulo/SP.`,
   );
 
   const bgRef = useRef<HTMLImageElement | null>(null);
@@ -38,22 +38,22 @@ export default function Company() {
   }, []);
 
   return (
-    <div className="pt-[76px] lg:pt-[118px]">
+    <div className="pt-[120px] lg:pt-[150px]">
       <header className="relative overflow-hidden border-b border-line-dark">
         <div className="absolute inset-0" aria-hidden="true">
-          <img src={IMG.patio} alt="" className="h-full w-full object-cover" />
+          <img src={IMG.road} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-coal-950/85" />
         </div>
         <div className="relative mx-auto max-w-(--container-site) px-6 py-24 md:py-32">
-          <Reveal><Kicker>Desde {BUSINESS.founded}</Kicker></Reveal>
+          <Reveal><Kicker>Desde {BUSINESS.founded} · {BUSINESS.yearsInMarket} anos</Kicker></Reveal>
           <Reveal delay={90}>
             <h1 className="mt-4 max-w-4xl font-display text-[clamp(2.6rem,7vw,5.5rem)] uppercase leading-[0.9]">
-              Máquina boa não se vende <span className="text-hz-400">sozinha</span>. Se entrega.
+              Peça boa se conhece <span className="text-hz-400">pelo balcão</span>.
             </h1>
           </Reveal>
           <Reveal delay={170}>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-bone-200/90">
-              A {BUSINESS.name} nasceu vendendo trator usado de procedência para produtor da região. Vinte e poucos anos depois, o pátio tem linha agrícola, linha pesada, implementos, oficina própria e mesa de crédito — mas o combinado continua o mesmo: máquina revisada, histórico aberto e pós-venda que atende o telefone.
+              Fundada em <strong className="text-hz-300">{BUSINESS.founded}</strong>, a {BUSINESS.name} atua na distribuição de peças novas de reposição para equipamentos <strong className="text-bone-100">Dynapac, Muller, Hamm, Tema-Terra, Caterpillar, Bomag, Volvo, Sany, XCMG, Bobcat</strong>, entre outras. Também trabalhamos com motores <strong className="text-bone-100">Perkins, MWM, Mercedes, Kubota, Deutz, Cummins, Eaton</strong> e bombas Sundstrand.
             </p>
           </Reveal>
         </div>
@@ -63,62 +63,85 @@ export default function Company() {
       <section className="border-b border-line-dark bg-coal-900">
         <div className="mx-auto grid max-w-(--container-site) grid-cols-2 lg:grid-cols-4">
           {BUSINESS.stats.map((s, i) => (
-            <div key={s.label} className={`border-line-dark px-6 py-10 md:py-14 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b lg:border-b-0" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 2 ? "border-r lg:border-r" : ""}`}>
-              <p className="font-display text-[clamp(2.4rem,5vw,4rem)] leading-none text-hz-300">
+            <div key={s.label} className={`border-line-dark px-6 py-10 md:py-14 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b lg:border-b-0" : ""} ${i === 1 ? "lg:border-r" : ""}`}>
+              <p className="font-display text-[clamp(2.2rem,4.5vw,3.6rem)] leading-none text-hz-300">
                 <Counter to={s.value} suffix={s.suffix} />
               </p>
-              <p className="mt-3 font-cond text-[13px] font-semibold uppercase tracking-[0.24em] text-steel-300">{s.label}</p>
+              <p className="mt-3 font-cond text-[13px] font-semibold uppercase tracking-[0.22em] text-steel-300">{s.label}</p>
             </div>
           ))}
         </div>
         <div className="border-t border-line-dark">
-          <p className="mx-auto max-w-(--container-site) px-6 py-4 font-cond text-[12px] font-semibold uppercase tracking-[0.22em] text-steel-500">
-            <span className="mr-2 inline-block h-2 w-2 animate-pulse bg-agri-400" aria-hidden="true" />
-            Agora no pátio: {availableCount()} máquinas disponíveis para faturamento imediato
+          <p className="mx-auto flex max-w-(--container-site) items-center gap-3 px-6 py-4 font-cond text-[12px] font-semibold uppercase tracking-[0.22em] text-steel-500">
+            <span className="h-2 w-2 animate-pulse bg-agri-400" aria-hidden="true" />
+            {availableCount()} itens do catálogo online agora — disponíveis para despacho imediato
           </p>
         </div>
       </section>
 
-      {/* pilares */}
+      {/* sede + missão/visão/valores */}
       <section className="border-b border-line-dark bg-coal-950 py-24 md:py-32">
         <div className="mx-auto max-w-(--container-site) px-6">
-          <SectionHead
-            kicker="Como trabalhamos"
-            title={<>Três regras que não <span className="text-hz-400">negociamos</span></>}
-          />
-          <div className="mt-14">
-            {[
-              { n: "01", icon: IcShield, t: "Histórico aberto", d: "Horímetro verificado, notas de manutenção e procedência de dono. Se a máquina tem passagem feia, ela não entra no pátio — e se entrou, você fica sabendo antes de pagar." },
-              { n: "02", icon: IcWrench, t: "Revisão de entrega", d: "Toda máquina sai com checklist de 120 pontos assinado pela oficina: filtros, óleo, hidráulica, rodado e elétrica. Máquina usada nossa não chega pingando na sua porteira." },
-              { n: "03", icon: IcTractor, t: "Pós-venda que atende", d: "Peças originais, atendimento em campo e consultor que responde depois da venda. Máquina parada é prejuízo seu e reputação nossa." },
-            ].map((p, i) => {
-              const Icon = p.icon;
-              return (
-                <Reveal key={p.n} delay={i * 90}>
-                  <div className="group grid gap-6 border-t border-line-dark py-9 transition-colors hover:bg-coal-900/60 md:grid-cols-[120px_64px_1fr] md:items-start md:px-6">
-                    <span className="font-display text-5xl text-coal-600 transition-colors duration-300 group-hover:text-hz-400">{p.n}</span>
-                    <span className="hidden text-hz-400 md:block"><Icon size={30} /></span>
-                    <div>
-                      <h3 className="font-display text-2xl uppercase md:text-3xl">{p.t}</h3>
-                      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-steel-300">{p.d}</p>
+          <div className="grid gap-12 lg:grid-cols-2">
+            <Reveal variant="left">
+              <div className="relative overflow-hidden border border-line-dark">
+                <img src={IMG.predio} alt={`Fachada da sede da ${BUSINESS.name}`} className="w-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-coal-950/90 to-transparent p-6">
+                  <p className="font-cond text-lg font-bold uppercase tracking-[0.2em] text-bone-100">Nossa sede</p>
+                  <p className="text-[14px] text-steel-300">{BUSINESS.address.street} — {BUSINESS.address.city}/{BUSINESS.address.state}</p>
+                </div>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-4">
+                {[
+                  { icon: IcTractor, t: "Transporte próprio", d: "E parcerias com todas as transportadoras" },
+                  { icon: IcShield, t: "Peças revisadas", d: "Durabilidade e eficiência conferidas" },
+                  { icon: IcWrench, t: "Conhecimento técnico", d: "A melhor solução, não só a venda" },
+                ].map((x) => {
+                  const Icon = x.icon;
+                  return (
+                    <div key={x.t} className="border border-line-dark bg-coal-900 p-4">
+                      <Icon size={22} className="text-hz-400" />
+                      <p className="mt-2 font-cond text-[13px] font-bold uppercase tracking-[0.12em] text-bone-100">{x.t}</p>
+                      <p className="mt-1 text-[12px] leading-snug text-steel-400">{x.d}</p>
                     </div>
+                  );
+                })}
+              </div>
+            </Reveal>
+
+            <div>
+              <SectionHead kicker="Quem somos" title={<>Mais de {BUSINESS.yearsInMarket} anos no mercado de <span className="text-hz-400">rolo compactador</span></>} />
+              <Reveal delay={100}>
+                <div className="mt-8 space-y-6">
+                  <div className="border-l-2 border-hz-400 pl-5">
+                    <h3 className="font-display text-xl uppercase">Nossa missão</h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-steel-300">{BUSINESS.mission}</p>
                   </div>
-                </Reveal>
-              );
-            })}
+                  <div className="border-l-2 border-steel-400 pl-5">
+                    <h3 className="font-display text-xl uppercase">Nossa visão</h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-steel-300">{BUSINESS.vision}</p>
+                  </div>
+                  <div className="border-l-2 border-agri-400 pl-5">
+                    <h3 className="font-display text-xl uppercase">Nossos valores</h3>
+                    <ul className="mt-2 flex flex-wrap gap-2">
+                      {BUSINESS.values.map((v) => (
+                        <li key={v} className="border border-line-dark bg-coal-900 px-3 py-1.5 font-cond text-[12px] font-bold uppercase tracking-[0.16em] text-bone-100">{v}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </Reveal>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* história com parallax */}
+      {/* linha do tempo com parallax */}
       <section ref={secRef} className="relative overflow-hidden border-b border-line-dark">
-        <img ref={bgRef} src={IMG.hero} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-[120%] w-full object-cover will-change-transform" />
-        <div className="absolute inset-0 bg-coal-950/80" aria-hidden="true" />
+        <img ref={bgRef} src={IMG.road} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-[120%] w-full object-cover will-change-transform" />
+        <div className="absolute inset-0 bg-coal-950/82" aria-hidden="true" />
         <div className="relative mx-auto max-w-(--container-site) px-6 py-24 md:py-32">
-          <SectionHead
-            kicker="Linha do tempo"
-            title={<>De revenda de usados a <span className="text-hz-400">pátio completo</span></>}
-          />
+          <SectionHead kicker="Linha do tempo" title={<>Do balcão de bairro à <span className="text-hz-400">distribuição nacional</span></>} />
           <div className="mt-12 grid gap-6 md:grid-cols-4">
             {MILESTONES.map((m, i) => (
               <Reveal key={m.year} delay={i * 100}>
@@ -132,29 +155,26 @@ export default function Company() {
         </div>
       </section>
 
-      {/* CTA institucional */}
+      {/* CTA */}
       <section className="bg-coal-950 py-24">
         <div className="mx-auto max-w-(--container-site) px-6">
           <div className="flex flex-wrap items-center justify-between gap-8 border border-line-dark bg-coal-900 p-8 md:p-12">
             <div className="max-w-xl">
-              <Kicker tone="agri">Porteira aberta</Kicker>
+              <Kicker tone="agri">Balcão aberto</Kicker>
               <h2 className="mt-4 font-display text-3xl uppercase leading-tight md:text-4xl">
-                Venha ver a máquina trabalhando antes de decidir
+                Traga a peça velha. Saia com a nova.
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-steel-300">
-                Pátio aberto para visita com hora marcada em {BUSINESS.address.city}/{BUSINESS.address.state}. Ligue a máquina, ande no talhão de teste e leve a ficha técnica impressa.
+                Atendimento de segunda a sexta, das 08h às 18h, na {BUSINESS.address.street} — ou pelo WhatsApp, de onde você estiver.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Btn href={waLink(BUSINESS.whatsapp, `Olá! Quero agendar uma visita ao pátio da ${BUSINESS.name}.`)} tone="agri" size="lg">
-                <IcWhatsApp size={17} /> Agendar visita
-              </Btn>
-              <Btn to="/maquinas" tone="outline" size="lg">
-                Ver estoque <IcArrow size={16} />
-              </Btn>
+              <Btn href={waLink(BUSINESS.whatsapp, generalMessage())} tone="agri" size="lg"><IcWhatsApp size={17} /> Solicitar orçamento</Btn>
+              <Btn to="/pecas" tone="outline" size="lg">Ver peças <IcArrow size={16} /></Btn>
             </div>
           </div>
         </div>
+        <HazardStrip className="mt-24 opacity-50" />
       </section>
     </div>
   );
