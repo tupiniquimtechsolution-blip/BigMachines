@@ -203,6 +203,90 @@ body {
   transform: translateY(0);
 }
 
+/* ==================================================================
+   DECK DE APRESENTAÇÃO (/apresentacao) — tela + impressão em PDF
+   Slides desenhados em 1600×1131px (proporção exata do A4 paisagem).
+   Na impressão viram 297×210mm com escala uniforme (~0,702).
+   ================================================================== */
+
+.deck-bg {
+  background:
+    radial-gradient(1100px 500px at 15% -10%, rgba(247, 168, 0, 0.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 20%, rgba(221, 58, 46, 0.05), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    var(--color-coal-950);
+  background-size: auto, auto, 44px 44px, 44px 44px, auto;
+}
+
+.deck-slide {
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--color-line-dark);
+}
+
+/* modo deck: esconde o chrome do site (navbar, footer, flutuantes) na tela e no print */
+html.deck-mode header,
+html.deck-mode footer {
+  display: none !important;
+}
+html.deck-mode .fixed:not(.deck-toolbar):not(.deck-nav) {
+  display: none !important;
+}
+
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    background: var(--color-coal-950) !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
+  }
+  .deck-toolbar,
+  .deck-nav {
+    display: none !important;
+  }
+  .deck-bg {
+    background: var(--color-coal-950) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  .deck-bg > div {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .deck-outer {
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 297mm !important;
+  }
+  .deck-slide {
+    transform: none !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    border: none !important;
+    break-after: page;
+    page-break-after: always;
+  }
+  .deck-slide:last-of-type {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,

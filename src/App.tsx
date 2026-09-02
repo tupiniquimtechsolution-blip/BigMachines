@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -12,13 +12,16 @@ import Catalog from "./pages/Catalog";
 import MachineDetail from "./pages/MachineDetail";
 import Company from "./pages/Company";
 import Contents from "./pages/Contents";
+import Deck from "./pages/Deck";
 import { ContactPage, FinancingPage, TradeInPage } from "./pages/Forms";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function App() {
+/** Smooth scroll global — desligado em reduced-motion e na rota de apresentação (deck usa scroll próprio + print) */
+function LenisController() {
+  const { pathname } = useLocation();
   useEffect(() => {
-    // Smooth scroll (Lenis) — desligado em prefers-reduced-motion
+    if (pathname === "/apresentacao") return;
     if (prefersReducedMotion()) return;
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     lenis.on("scroll", () => ScrollTrigger.update());
@@ -29,11 +32,15 @@ export default function App() {
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
-  }, []);
+  }, [pathname]);
+  return null;
+}
 
+export default function App() {
   return (
     <AppProvider>
       <HashRouter>
+        <LenisController />
         <ScrollToTop />
         <PageShell>
           <Routes>
@@ -49,6 +56,7 @@ export default function App() {
             <Route path="/empresa" element={<Company />} />
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/conteudos" element={<Contents />} />
+            <Route path="/apresentacao" element={<Deck />} />
             <Route path="*" element={<Catalog mode="all" />} />
           </Routes>
         </PageShell>
