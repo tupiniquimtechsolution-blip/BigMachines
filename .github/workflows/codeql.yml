@@ -2,7 +2,7 @@ name: CodeQL
 
 on:
   push:
-    branches: [main, "tupiniquim/**"]
+    branches: [main, "tupiniquim/**", "chore/**"]
   pull_request:
     branches: [main]
 
@@ -19,8 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
       - name: Analyze
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
